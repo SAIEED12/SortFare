@@ -1,0 +1,59 @@
+---
+description: FlyRank stack, architecture, and project conventions
+alwaysApply: true
+---
+
+# FlyRank Capstone Project
+
+## Stack
+
+- **Frontend:** Next.js 15 (App Router), React, Tailwind CSS
+- **Backend:** Express.js (REST API)
+- **Database:** MongoDB Atlas
+- **Auth:** Better Auth
+
+## Architecture
+
+- Use the Next.js App Router (`app/` directory) for pages, layouts, and route handlers.
+- Keep Express as a separate API server; do not mix Express middleware into Next.js unless explicitly required.
+- Connect to MongoDB Atlas via environment variables — never hardcode connection strings.
+- Use Better Auth for authentication flows; follow its session and provider patterns.
+- Style UI with Tailwind CSS utility classes; avoid inline styles and ad-hoc CSS unless necessary.
+
+## Naming Conventions
+
+- React components: **PascalCase** file and export names (e.g., `FlightCard.tsx`, `export function FlightCard()`).
+- Hooks: `use` prefix in camelCase (e.g., `useFlightSearch.ts`).
+- API routes and Express handlers: camelCase or kebab-case matching existing files in the directory.
+- Environment variables: `SCREAMING_SNAKE_CASE`.
+
+## Git & Commits
+
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add flight search endpoint
+fix: resolve auth session expiry
+docs: update README setup steps
+chore: bump dependencies
+```
+
+- **Never commit `.env` files** or any file containing secrets, API keys, or credentials.
+- Use `.env.example` with placeholder values for required variables.
+
+## Environment Variables
+
+Required variables (set locally in `.env`, never committed):
+
+```env
+MONGODB_URI=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+NEXT_PUBLIC_API_URL=
+```
+
+## Code Style
+
+- Prefer TypeScript for both frontend and backend.
+- Colocate component-specific logic; extract shared logic into `lib/` or `hooks/`.
+- Handle API errors explicitly — return meaningful status codes and messages from Express.
