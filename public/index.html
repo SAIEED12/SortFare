@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SortFare Settings</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="card" aria-labelledby="settings-title">
+        <h1 id="settings-title">Notification settings</h1>
+        <p>Choose how SortFare updates you about new flight matches.</p>
+        <form id="settings-form" novalidate>
+          <label class="field" for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" aria-describedby="email-error" required>
+          <p class="error" id="email-error" role="alert"></p>
+
+          <label class="field" for="interval">Delivery interval</label>
+          <select id="interval" name="interval" aria-describedby="interval-error" required>
+            <option value="">Select an option</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <p class="error" id="interval-error" role="alert"></p>
+
+          <label class="checkbox-row" for="digest">
+            <input id="digest" name="digest" type="checkbox">
+            <span>Send me a summary digest</span>
+          </label>
+
+          <button type="submit">Save settings</button>
+          <p class="success" id="form-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

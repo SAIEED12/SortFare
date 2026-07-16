@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  color: #14213d;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  width: min(100%, 32rem);
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.field,
+.checkbox-row {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+}
+
+button {
+  margin-top: 1.25rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.error {
+  color: #b91c1c;
+  min-height: 1.25rem;
+  margin: 0.25rem 0 0;
+}
+
+.success {
+  color: #166534;
+  min-height: 1.25rem;
+  margin: 0.75rem 0 0;
+}
