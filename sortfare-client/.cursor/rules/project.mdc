@@ -1,0 +1,76 @@
+---
+alwaysApply: true
+---
+# SortFare
+
+## Product Scope
+
+SortFare lets users search, compare, and rank/sort flights across airlines. There is no booking, payment, or seat-selection — users are linked out to the airline's site to complete purchase.
+
+## Stack
+
+- **Framework:** Next.js 15 (App Router), React, Tailwind CSS
+- **Language:** Plain JavaScript (`.js` / `.jsx`) — **no TypeScript**
+- **UI:** [HeroUI](https://www.heroui.com/) (primary) + [Shadcn UI](https://ui.shadcn.com/) (supplementary primitives)
+- **Auth:** Better Auth (client + catch-all route handler in `app/api/auth/`)
+- **External API:** Separate SortFare server (not in this repo)g
+
+## Architecture
+
+- Use the Next.js App Router (`app/` directory) for pages, layouts, and client components.
+- **Do not** add Express, standalone Node servers, or business-logic API routes in this repo.
+- **Allowed server-side code:** Better Auth only — e.g. `app/api/auth/[...all]/route.js` and its supporting `lib/auth.js` config.
+- All flight/search/data requests go to the external API using `NEXT_PUBLIC_API_URL`.
+- Wrap the app with HeroUI's provider; add Shadcn components via the CLI into `components/ui/` as needed.
+- Use `jsconfig.json` (not `tsconfig.json`) for path aliases (e.g. `@/components`, `@/lib`).
+- Style UI with Tailwind CSS utility classes; avoid inline styles and ad-hoc CSS unless necessary.
+
+## UI Library Guidance
+
+- Prefer **HeroUI** for layout, forms, navigation, and primary interactive components.
+- Use **Shadcn UI** when HeroUI lacks a specific primitive (dialogs, command palette, etc.).
+- Do not duplicate the same component from both libraries; pick one per use case.
+
+## Naming Conventions
+
+- React components: **PascalCase** with `.jsx` (e.g., `FlightCard.jsx`, `export function FlightCard()`).
+- Hooks and utilities: camelCase with `.js` (e.g., `useFlightSearch.js`).
+- Route handlers: `route.js` under `app/api/`.
+- Environment variables: `SCREAMING_SNAKE_CASE`.
+
+## Git & Commits
+
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add flight results sort controls
+fix: resolve auth session expiry on login
+docs: update README setup steps
+chore: bump dependencies
+```
+
+- **Never commit `.env` files** or any file containing secrets, API keys, or credentials.
+- Use `.env.example` with placeholder values for required variables.
+
+## Environment Variables
+
+Required variables (set locally in `.env.local`, never committed):
+
+```env
+# External SortFare API (separate server repo)
+NEXT_PUBLIC_API_URL=
+
+# Better Auth (Next.js route handlers in this repo)
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+```
+
+If Better Auth uses a database adapter, add the adapter-specific variable to `.env.example` when auth is scaffolded (e.g. `MONGODB_URI` for a Mongo adapter) — scoped to auth only, not business data.
+
+## Code Style
+
+- **JavaScript only** — no `.ts`, `.tsx`, or `typescript` dependency.
+- Use JSDoc comments for non-obvious prop shapes if needed (optional, not mandatory).
+- Colocate component-specific logic; extract shared logic into `lib/` or `hooks/`.
+- Handle API errors explicitly in client fetch calls — surface meaningful UI error states.
+- Do not add Express-style handler patterns or backend validation logic meant for the separate server.
