@@ -26,3 +26,74 @@
   --font-family-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-family-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
+
+/* --- Chat motion (components/Chat.jsx) --- */
+
+/* Message entrance: new assistant replies rise into place, 300ms ease-out. */
+@keyframes sf-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Blinking caret shown inside a still-open code fence while streaming. */
+@keyframes sf-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Thinking-dots → first-token handoff: the dots fade out over 400ms while
+   the first text fades in underneath — an overlap, never a swap. */
+@keyframes sf-dots-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sf-text-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-message-in {
+  animation: sf-message-in 0.3s ease-out both;
+}
+
+.animate-caret {
+  animation: sf-caret 1s step-end infinite;
+}
+
+.sf-dots-leave {
+  animation: sf-dots-leave 0.4s ease-out forwards;
+}
+
+.sf-text-enter {
+  animation: sf-text-enter 0.4s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-message-in {
+    animation: none;
+  }
+  .animate-caret {
+    animation: none;
+  }
+  .sf-dots-leave,
+  .sf-text-enter {
+    animation: none;
+  }
+}
