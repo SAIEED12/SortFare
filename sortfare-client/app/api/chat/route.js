@@ -8,6 +8,7 @@
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
+  isStepCount,
   streamText,
   toUIMessageStream,
 } from 'ai'
@@ -17,9 +18,33 @@ import {
   model,
   SYSTEM_PROMPT,
 } from '@/lib/ai/model'
+import { searchFlights } from '@/lib/ai/tools/searchFlights'
+import { getFlightDetails } from '@/lib/ai/tools/getFlightDetails'
 
 // Allow up to 30s for the Gemini stream (default is 10s on some platforms).
 export const maxDuration = 30
+
+// FE-07: the model may call these tools. The same set is passed to
+// `toUIMessageStream` so the client receives *typed* tool parts
+// (tool-searchFlights / tool-getFlightDetails) with schema-derived
+// input/output shapes instead of untyped dynamic-tool parts.
+export const tools = {
+  searchFlights,
+  getFlightDetails,
+}
+
+// Sanitizes tool error text before it reaches the client. The designed,
+// human-readable messages thrown by the tool `execute` functions live on
+// the error's cause chain — surface those. Everything else stays generic so
+// server internals never leak (the SDK's default hides everything).
+function toolErrorText(error) {
+  let current = error
+  for (let depth = 0; depth < 3 && current; depth++) {
+    if (typeof current.message === 'string' && current.message) return current.message
+    current = current?.cause
+  }
+  return 'An error occurred while running this tool. Please try again.'
+}
 
 export async function POST(req) {
   const { messages } = await req.json()
@@ -33,12 +58,17 @@ export async function POST(req) {
     messages: await convertToModelMessages(messages),
     temperature: MODEL_TEMPERATURE,
     maxOutputTokens: MAX_OUTPUT_TOKENS,
+    tools,
+    // v7 default is isStepCount(1) — the stream would end right after the
+    // tool runs and the summary would never arrive. Keep the tool loop
+    // server-side so one request streams tool parts AND the final answer.
+    stopWhen: isStepCount(20),
   })
 
   // v7: `result.toUIMessageStreamResponse()` is deprecated; stream the
   // result's `stream` (renamed from `fullStream`) through the top-level
   // helpers instead.
   return createUIMessageStreamResponse({
-    stream: toUIMessageStream({ stream: result.stream }),
+    stream: toUIMessageStream({ stream: result.stream, tools, onError: toolErrorText }),
   })
 }

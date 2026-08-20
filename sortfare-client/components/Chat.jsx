@@ -4,6 +4,7 @@ import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import ToolCall from '@/components/ToolCall'
 
 // ---------------------------------------------------------------------------
 // Persistence (stretch goal): the conversation survives a refresh via
@@ -157,7 +158,9 @@ function ThinkingDots({ show }) {
 }
 
 function AssistantMessage({ message, isStreaming }) {
+  const parts = message?.parts ?? []
   const text = messageText(message)
+  const hasToolParts = parts.some((p) => typeof p.type === 'string' && p.type.startsWith('tool-'))
   const [dotsGone, setDotsGone] = useState(false)
 
   // Unmount the dots once the fade-out animation has finished. The fade
@@ -172,6 +175,29 @@ function AssistantMessage({ message, isStreaming }) {
 
   const showDots = isStreaming && (text.length === 0 || !dotsGone)
   const handoff = isStreaming && text.length > 0
+
+  // Render parts in stream order: text runs become markdown, tool parts
+  // become ToolCall cards. Tool cards render even when no text has arrived
+  // yet, so a running tool is visible while the model is still writing its
+  // summary.
+  const renderedParts = []
+  let textBuffer = ''
+  const flushText = () => {
+    if (!textBuffer) return
+    renderedParts.push(
+      <MarkdownContent key={`text-${renderedParts.length}`} text={textBuffer} isStreaming={isStreaming} />,
+    )
+    textBuffer = ''
+  }
+  for (const p of parts) {
+    if (p.type === 'text') {
+      textBuffer += p.text
+    } else if (typeof p.type === 'string' && p.type.startsWith('tool-')) {
+      flushText()
+      renderedParts.push(<ToolCall key={p.toolCallId} part={p} />)
+    }
+  }
+  flushText()
 
   return (
     <div className="animate-message-in flex gap-3 motion-reduce:animate-none">
@@ -193,13 +219,13 @@ function AssistantMessage({ message, isStreaming }) {
             {!handoff && <span className="sr-only">Assistant is thinking</span>}
           </div>
         )}
-        {text.length > 0 && (
+        {(text.length > 0 || hasToolParts) && (
           <div
             className={`text-sm text-gray-800 ${handoff ? 'sf-text-enter' : ''}`}
             role="log"
             aria-live="polite"
           >
-            <MarkdownContent text={text} isStreaming={isStreaming} />
+            {renderedParts}
           </div>
         )}
         {!isStreaming && text.length > 0 && (

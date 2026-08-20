@@ -85,6 +85,27 @@
   animation: sf-text-enter 0.4s ease-out both;
 }
 
+/* --- Tool part states (components/ToolCall.jsx) --- */
+
+/* Each tool lifecycle phase (streaming → args → results / error) crossfades
+   into place: a short fade + 4px rise. The card frame never moves, so the
+   transition morphs instead of jumping layout. Keyed by part.state in
+   ToolCall, so re-mounting the body replays this animation. */
+@keyframes sf-tool-phase-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sf-tool-phase-in {
+  animation: sf-tool-phase-in 0.22s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-message-in {
     animation: none;
@@ -94,6 +115,9 @@
   }
   .sf-dots-leave,
   .sf-text-enter {
+    animation: none;
+  }
+  .sf-tool-phase-in {
     animation: none;
   }
 }

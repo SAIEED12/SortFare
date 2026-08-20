@@ -6,7 +6,6 @@
 // FE-07 (tools, structured output) extends this module — keep it free of
 // UI concerns, with comments explaining each knob.
 import { createGoogle } from '@ai-sdk/google'
-import { flights } from '@/data/flights'
 
 // ---------------------------------------------------------------------------
 // Model configuration
@@ -42,23 +41,6 @@ export const model = (() => {
 })()
 
 // ---------------------------------------------------------------------------
-// Flight catalog context
-// ---------------------------------------------------------------------------
-
-// Flattens the in-app flight dataset into a compact, token-cheap listing the
-// model can reason over. Kept small on purpose: the system prompt treats it
-// as a sample cache, not live inventory.
-export function buildFlightsContext(list = flights) {
-  return list
-    .map((f) => {
-      const stops = f.stops === 0 ? 'nonstop' : `${f.stops} stop${f.stops > 1 ? 's' : ''}`
-      const duration = `${(f.duration / 60).toFixed(1)}h`
-      return `${f.id}. ${f.airline} ${f.flightNumber} · ${f.departure.code} → ${f.arrival.code} · dep ${f.departure.time} · ${duration} · ${stops} · ${f.price}${f.currency}`
-    })
-    .join('\n')
-}
-
-// ---------------------------------------------------------------------------
 // System prompt
 // ---------------------------------------------------------------------------
 
@@ -71,20 +53,21 @@ book directly with the airline — no booking fees, no markup.
 Ground rules:
 - Answer questions about flights, fares, airlines, and travel tips. Help
   travelers decide which option fits best: price, duration, stops, timing.
-- A snapshot of the sorted flight catalog for JFK → ORD is provided below
-  (FLIGHTS_AVAILABLE). Only cite flights that exist in it. If a flight id or
-  fare is not there, do not invent it.
-- The catalog is a sample of the real inventory. If the user asks about a
-  route that is not in the snapshot (e.g. a different city pair), say their
-  search on the SortFare Flights page will show live results, and keep
-  helping with comparisons and tips.
+- For ANY question about specific flights, fares, or comparisons, call the
+  searchFlights tool — do not invent flight numbers or prices from memory.
+  The tool returns the real catalog, so always cite flight numbers, times,
+  and fares from its result and nothing else.
+- If the user asks about one specific flight (e.g. "tell me about DL 482"),
+  call getFlightDetails with that flight's catalog id; if you only have a
+  flight number, use searchFlights first to find the id.
+- The demo catalog only covers JFK → ORD. searchFlights will fail for other
+  routes — in that case, explain the catalog's scope and point the user to
+  the Flights page for live search. Never guess data for routes outside the
+  catalog.
 - Booking happens on the airline's own site. Never ask for payment details,
   personal identity, or credentials. You cannot book, change, or cancel
   anything.
 - Prefer concise, practical answers. Use short markdown: bold for key facts,
   tight lists, and small tables when comparing 2–4 flights. Do not overuse
   headings.
-
-FLIGHTS_AVAILABLE:
-${buildFlightsContext()}
 `.trim()
