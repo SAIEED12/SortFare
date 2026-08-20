@@ -188,6 +188,10 @@ Transitions between states crossfade (`sf-tool-phase-in`, 220ms) inside a stable
 
 **To demo the error state:** ask "what's the cheapest flight from LAX to SFO?" — the route is outside the catalog and the tool fails on purpose.
 
+### Provider quota note
+
+The assistant runs on a free-tier Gemini API key: **20 model requests per day** for `gemini-3.6-flash` (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`). Every tool step is one request, so a typical comparison question costs 2–3 of the daily 20. When the cap is hit, the model stream fails with a 429 — the chat renders a designed amber "daily free-tier limit reached" card (not a crash) and the quota resets at midnight Pacific. To raise the limit, enable billing for the key at [ai.google.dev/gemini-api](https://ai.google.dev/gemini-api) and update `GEMINI_API_KEY` in `.env.local` and the Vercel environment.
+
 ## License
 
 This project is licensed under the MIT License.

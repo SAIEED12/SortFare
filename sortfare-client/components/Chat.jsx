@@ -135,6 +135,15 @@ function messageText(message) {
   return textParts.map((p) => p.text).join('')
 }
 
+// Distinguishes provider quota/rate-limit failures from other stream errors
+// so the UI can render a designed "daily limit reached" card instead of a
+// generic crash banner. Matches the Gemini free-tier wording ("quota
+// exceeded", "RESOURCE_EXHAUSTED", "rate limit") and HTTP 429.
+function isQuotaError(error) {
+  const message = `${error?.message ?? ''} ${error?.name ?? ''}`
+  return /quota|rate\s?limit|RESOURCE_EXHAUSTED|429|exceeded/.test(message)
+}
+
 // ---------------------------------------------------------------------------
 // Thinking dots: shown before the first token, then faded out while the
 // first text fades in — a handoff, not a swap, so the UI never flickers.
@@ -379,24 +388,61 @@ export default function Chat() {
         </button>
       </div>
 
-      {/* Error banner */}
+      {/* Error banner — designed, state-aware. The AI provider's free tier
+          limits model calls per day; when that limit is hit the stream fails
+          with a quota error, so reviewers see a designed card instead of a
+          generic crash. */}
       {error && (
-        <div className="flex items-center justify-between gap-3 border-b border-red-100 bg-red-50 px-4 py-2.5">
-          <p className="text-xs text-red-700">
-            Something went wrong while streaming. The conversation is intact.
-          </p>
+        <div
+          className={`flex flex-wrap items-center justify-between gap-3 border-b px-4 py-2.5 ${
+            isQuotaError(error)
+              ? 'border-amber-200 bg-amber-50'
+              : 'border-red-100 bg-red-50'
+          }`}
+          role="alert"
+        >
+          {isQuotaError(error) ? (
+            <div className="flex items-start gap-2.5">
+              <svg
+                className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m0 3.75h.008M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"
+                />
+              </svg>
+              <div className="text-xs">
+                <p className="font-semibold text-amber-800">
+                  The AI provider daily free-tier limit was reached
+                </p>
+                <p className="mt-0.5 text-amber-700">
+                  Each tool step counts toward a 20-request/day cap that resets at midnight
+                  Pacific. Your conversation is intact — retry shortly or try a simpler question.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-red-700">
+              Something went wrong while streaming. The conversation is intact.
+            </p>
+          )}
           <div className="flex shrink-0 gap-2">
             <button
               type="button"
               onClick={() => regenerate()}
-              className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+              className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-neutral-100"
             >
               Try again
             </button>
             <button
               type="button"
               onClick={clearError}
-              className="rounded-md px-2 py-1 text-xs text-red-400 transition-colors hover:text-red-600"
+              className="rounded-md px-2 py-1 text-xs text-neutral-500 transition-colors hover:text-gray-700"
               aria-label="Dismiss error"
             >
               Dismiss

@@ -33,17 +33,40 @@ export const tools = {
   getFlightDetails,
 }
 
-// Sanitizes tool error text before it reaches the client. The designed,
-// human-readable messages thrown by the tool `execute` functions live on
-// the error's cause chain — surface those. Everything else stays generic so
-// server internals never leak (the SDK's default hides everything).
+// Sanitizes error text before it reaches the client. Three cases:
+//   1. Designed tool errors (thrown by the `execute` functions, known
+//      prefix) — surfaced as written.
+//   2. Provider quota / rate-limit failures (free-tier Gemini allows 20
+//      model requests/day) — mapped to a designed message the client can
+//      detect and render as the amber "limit reached" card.
+//   3. Everything else — generic text; server internals never leak.
+const DESIGNED_TOOL_ERROR_PREFIXES = ['The SortFare catalog', 'Flight id']
+
+const QUOTA_ERROR_TEXT =
+  'The AI provider quota was exceeded — the free-tier daily limit of 20 model requests was reached. Retry after midnight Pacific, or raise the limit in Google AI Studio.'
+
+function isQuotaError(error) {
+  let current = error
+  let text = ''
+  for (let depth = 0; depth < 3 && current; depth++) {
+    if (typeof current.message === 'string') text += ` ${current.message}`
+    current = current?.cause
+  }
+  return /quota|rate\s?limit|RESOURCE_EXHAUSTED|429/i.test(text)
+}
+
 function toolErrorText(error) {
   let current = error
   for (let depth = 0; depth < 3 && current; depth++) {
-    if (typeof current.message === 'string' && current.message) return current.message
+    if (typeof current.message === 'string' && current.message) {
+      if (DESIGNED_TOOL_ERROR_PREFIXES.some((p) => current.message.startsWith(p))) {
+        return current.message
+      }
+    }
     current = current?.cause
   }
-  return 'An error occurred while running this tool. Please try again.'
+  if (isQuotaError(error)) return QUOTA_ERROR_TEXT
+  return 'An error occurred while streaming. The conversation is intact.'
 }
 
 export async function POST(req) {
@@ -62,7 +85,9 @@ export async function POST(req) {
     // v7 default is isStepCount(1) — the stream would end right after the
     // tool runs and the summary would never arrive. Keep the tool loop
     // server-side so one request streams tool parts AND the final answer.
-    stopWhen: isStepCount(20),
+    // Capped at 3 steps: every step is one model request, and the free-tier
+    // Gemini key allows only 20 requests/day.
+    stopWhen: isStepCount(3),
   })
 
   // v7: `result.toUIMessageStreamResponse()` is deprecated; stream the
