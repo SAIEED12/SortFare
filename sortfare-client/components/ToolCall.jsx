@@ -25,6 +25,11 @@ const TOOL_META = {
     running: 'Loading flight…',
     streaming: 'Reading your request…',
   },
+  fetchUrl: {
+    label: 'Web fetch',
+    running: 'Fetching page…',
+    streaming: 'Reading your request…',
+  },
 }
 
 function IconMagnifier() {
@@ -39,6 +44,14 @@ function IconTicket() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18v4a3 3 0 0 0 0 4v4H3V6Zm6 0v12" />
+    </svg>
+  )
+}
+
+function IconGlobe() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.467.729-3.573" />
     </svg>
   )
 }
@@ -171,7 +184,7 @@ export default function ToolCall({ part }) {
   const toolName = part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : 'unknown'
   const meta = TOOL_META[toolName] ?? { label: toolName, running: 'Running…', streaming: 'Reading…' }
 
-  const icon = toolName === 'getFlightDetails' ? <IconTicket /> : <IconMagnifier />
+  const icon = toolName === 'getFlightDetails' ? <IconTicket /> : toolName === 'fetchUrl' ? <IconGlobe /> : <IconMagnifier />
 
   let body
   let statusCount = null
@@ -196,6 +209,33 @@ export default function ToolCall({ part }) {
         </div>
       ) : (
         <p className="text-sm text-neutral-500">No flight returned.</p>
+      )
+    } else if (toolName === 'fetchUrl') {
+      const output = part.output
+      statusCount = output?.success ? 1 : null
+      body = output ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <a
+              href={output.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-700"
+            >
+              {output.title || output.url}
+            </a>
+            {!output.success && (
+              <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+                Failed
+              </span>
+            )}
+          </div>
+          <p className="text-xs leading-5 text-gray-600 whitespace-pre-wrap line-clamp-6">
+            {output.content}
+          </p>
+        </div>
+      ) : (
+        <p className="text-sm text-neutral-500">No content returned.</p>
       )
     } else {
       const result = part.output

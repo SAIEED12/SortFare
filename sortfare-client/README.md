@@ -175,6 +175,27 @@ Returns one flight's full details. The model picks between this and `searchFligh
 
 **Errors:** unknown id throws with the valid id list in the message.
 
+### `fetchUrl` — `lib/ai/tools/fetchUrl.js`
+
+Fetches a web page by URL and returns its text content. Uses the native Node.js `fetch()` API — no external dependencies.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `url` | `string` (valid URL) | The URL to fetch. Must be HTTP or HTTPS. |
+
+**Return shape:**
+
+```js
+{
+  url: string,        // The URL that was fetched
+  title: string|null, // Page title if found in HTML, otherwise null
+  content: string,    // Extracted text content (truncated to ~4000 chars)
+  success: boolean,   // Whether the fetch succeeded
+}
+```
+
+**Errors:** network failures, timeouts (10s), and non-OK HTTP statuses are caught and returned as `success: false` with an error message — never thrown.
+
 ### Tool part states and their UI (components/ToolCall.jsx)
 
 | State | User question it answers | Visual treatment |

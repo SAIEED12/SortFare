@@ -20,17 +20,19 @@ import {
 } from '@/lib/ai/model'
 import { searchFlights } from '@/lib/ai/tools/searchFlights'
 import { getFlightDetails } from '@/lib/ai/tools/getFlightDetails'
+import { fetchUrl } from '@/lib/ai/tools/fetchUrl'
 
 // Allow up to 30s for the Gemini stream (default is 10s on some platforms).
 export const maxDuration = 30
 
 // FE-07: the model may call these tools. The same set is passed to
 // `toUIMessageStream` so the client receives *typed* tool parts
-// (tool-searchFlights / tool-getFlightDetails) with schema-derived
-// input/output shapes instead of untyped dynamic-tool parts.
+// (tool-searchFlights / tool-getFlightDetails / tool-fetchUrl) with
+// schema-derived input/output shapes instead of untyped dynamic-tool parts.
 export const tools = {
   searchFlights,
   getFlightDetails,
+  fetchUrl,
 }
 
 // Sanitizes error text before it reaches the client. Three cases:
