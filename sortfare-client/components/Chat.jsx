@@ -45,9 +45,6 @@ function clearStoredMessages() {
 // Markdown helpers
 // ---------------------------------------------------------------------------
 
-// While streaming, an odd number of ``` means a code fence is still open and
-// react-markdown would try to parse a half-finished fence — rendering that
-// tail as a plain preformatted block instead keeps the layout intact.
 function hasOpenCodeFence(text) {
   const fences = text.match(/```/g)
   return fences ? fences.length % 2 === 1 : false
@@ -135,13 +132,22 @@ function messageText(message) {
   return textParts.map((p) => p.text).join('')
 }
 
-// Distinguishes provider quota/rate-limit failures from other stream errors
-// so the UI can render a designed "daily limit reached" card instead of a
-// generic crash banner. Matches the Gemini free-tier wording ("quota
-// exceeded", "RESOURCE_EXHAUSTED", "rate limit") and HTTP 429.
+// ---------------------------------------------------------------------------
+// Error classification — distinguishes three error kinds so the UI can
+// render a designed card for each:
+//   1. Quota/rate-limit (amber) — Gemini free-tier daily cap
+//   2. Network failure (orange) — fetch() threw TypeError
+//   3. Generic streaming error (red) — everything else
+// ---------------------------------------------------------------------------
+
 function isQuotaError(error) {
   const message = `${error?.message ?? ''} ${error?.name ?? ''}`
   return /quota|rate\s?limit|RESOURCE_EXHAUSTED|429|exceeded/.test(message)
+}
+
+function isNetworkError(error) {
+  const message = `${error?.message ?? ''} ${error?.name ?? ''} ${error?.cause?.message ?? ''}`
+  return /Failed to fetch|NetworkError|network|ECONNREFUSED|ERR_NETWORK/i.test(message)
 }
 
 // ---------------------------------------------------------------------------
@@ -172,9 +178,6 @@ function AssistantMessage({ message, isStreaming }) {
   const hasToolParts = parts.some((p) => typeof p.type === 'string' && p.type.startsWith('tool-'))
   const [dotsGone, setDotsGone] = useState(false)
 
-  // Unmount the dots once the fade-out animation has finished. The fade
-  // itself is CSS-driven (sf-dots-leave / sf-text-enter), so no synchronous
-  // state flip is needed — the classes derive straight from the props.
   useEffect(() => {
     if (isStreaming && text.length > 0) {
       const t = setTimeout(() => setDotsGone(true), DOTS_FADE_MS)
@@ -185,10 +188,6 @@ function AssistantMessage({ message, isStreaming }) {
   const showDots = isStreaming && (text.length === 0 || !dotsGone)
   const handoff = isStreaming && text.length > 0
 
-  // Render parts in stream order: text runs become markdown, tool parts
-  // become ToolCall cards. Tool cards render even when no text has arrived
-  // yet, so a running tool is visible while the model is still writing its
-  // summary.
   const renderedParts = []
   let textBuffer = ''
   const flushText = () => {
@@ -276,15 +275,13 @@ export default function Chat() {
     })
 
   const [input, setInput] = useState('')
+  const [retrying, setRetrying] = useState(false)
 
   const scrollRef = useRef(null)
   const textareaRef = useRef(null)
   const [atBottom, setAtBottom] = useState(true)
 
   // --- persistence ------------------------------------------------
-  // Loaded after hydration in an effect so SSR and client first renders
-  // never disagree. Saving skips the empty conversation so clearing +
-  // refreshing stays cleared.
   useEffect(() => {
     const stored = loadStoredMessages()
     if (stored.length > 0) setMessages(stored)
@@ -315,6 +312,15 @@ export default function Chat() {
     setAtBottom(true)
   }
 
+  // --- Mobile Safari keyboard handling ----------------------------------
+  const textareaFocus = useCallback(() => {
+    // When the virtual keyboard opens on iOS Safari, scroll the input
+    // into view after a short delay to account for the keyboard animation.
+    setTimeout(() => {
+      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }, 300)
+  }, [])
+
   // --- input handling ---------------------------------------------
   const isBusy = status === 'submitted' || status === 'streaming'
 
@@ -336,7 +342,6 @@ export default function Chat() {
     }
   }
 
-  // Keep the textarea height in sync with its content (max 5 rows-ish).
   useEffect(() => {
     const el = textareaRef.current
     if (!el) return
@@ -349,11 +354,17 @@ export default function Chat() {
     clearStoredMessages()
   }
 
+  const handleRetry = useCallback(() => {
+    if (retrying || status === 'submitted' || status === 'streaming') return
+    setRetrying(true)
+    regenerate()
+    const t = setTimeout(() => setRetrying(false), 1500)
+    return () => clearTimeout(t)
+  }, [retrying, status, regenerate])
+
   const lastMessage = messages[messages.length - 1]
   const showRegenerate =
     lastMessage?.role === 'assistant' && status === 'ready' && !error
-
-  const conversationLive = messages.length > 0 || isBusy
 
   return (
     <div className="flex h-[70dvh] min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm sm:rounded-3xl">
@@ -388,33 +399,25 @@ export default function Chat() {
         </button>
       </div>
 
-      {/* Error banner — designed, state-aware. The AI provider's free tier
-          limits model calls per day; when that limit is hit the stream fails
-          with a quota error, so reviewers see a designed card instead of a
-          generic crash. */}
+      {/* Error banner — designed, state-aware. Three tiers:
+          1. Quota error (amber) — free-tier daily limit reached
+          2. Network error (orange) — no internet connection
+          3. Generic error (red) — something else went wrong */}
       {error && (
         <div
-          className={`flex flex-wrap items-center justify-between gap-3 border-b px-4 py-2.5 ${
+          className={`flex flex-wrap items-center justify-between gap-3 border-b px-4 py-2.5 sf-error-in ${
             isQuotaError(error)
               ? 'border-amber-200 bg-amber-50'
-              : 'border-red-100 bg-red-50'
+              : isNetworkError(error)
+                ? 'border-orange-200 bg-orange-50'
+                : 'border-red-100 bg-red-50'
           }`}
           role="alert"
         >
           {isQuotaError(error) ? (
             <div className="flex items-start gap-2.5">
-              <svg
-                className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m0 3.75h.008M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"
-                />
+              <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" />
               </svg>
               <div className="text-xs">
                 <p className="font-semibold text-amber-800">
@@ -426,6 +429,20 @@ export default function Chat() {
                 </p>
               </div>
             </div>
+          ) : isNetworkError(error) ? (
+            <div className="flex items-start gap-2.5">
+              <svg className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" />
+              </svg>
+              <div className="text-xs">
+                <p className="font-semibold text-orange-800">
+                  No internet connection
+                </p>
+                <p className="mt-0.5 text-orange-700">
+                  Check your connection and try again. The conversation is intact.
+                </p>
+              </div>
+            </div>
           ) : (
             <p className="text-xs text-red-700">
               Something went wrong while streaming. The conversation is intact.
@@ -434,10 +451,17 @@ export default function Chat() {
           <div className="flex shrink-0 gap-2">
             <button
               type="button"
-              onClick={() => regenerate()}
-              className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-neutral-100"
+              onClick={handleRetry}
+              disabled={retrying || status === 'submitted' || status === 'streaming'}
+              className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-neutral-100 disabled:pointer-events-none disabled:opacity-50"
             >
-              Try again
+              {retrying && (
+                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4Z" />
+                </svg>
+              )}
+              Retry this message
             </button>
             <button
               type="button"
@@ -455,7 +479,7 @@ export default function Chat() {
       <div
         ref={scrollRef}
         onScroll={checkAtBottom}
-        className="relative flex-1 overflow-y-auto overscroll-contain bg-neutral-50"
+        className="chat-messages-container relative flex-1 overflow-y-auto overscroll-contain bg-neutral-50"
       >
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-4">
           {messages.length === 0 && !isBusy && (
@@ -511,7 +535,6 @@ export default function Chat() {
           })}
         </div>
 
-        {/* Jump to latest — visible only when the user has scrolled up */}
         {!atBottom && (
           <button
             type="button"
@@ -541,6 +564,7 @@ export default function Chat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
+            onFocus={textareaFocus}
             placeholder="Ask about flights, fares, or travel tips…"
             disabled={isBusy}
             aria-label="Message the SortFare assistant"
