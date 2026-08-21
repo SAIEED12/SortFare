@@ -29,7 +29,6 @@
 
 /* --- Chat motion (components/Chat.jsx) --- */
 
-/* Message entrance: new assistant replies rise into place, 300ms ease-out. */
 @keyframes sf-message-in {
   from {
     opacity: 0;
@@ -41,7 +40,6 @@
   }
 }
 
-/* Blinking caret shown inside a still-open code fence while streaming. */
 @keyframes sf-caret {
   0%,
   100% {
@@ -52,8 +50,6 @@
   }
 }
 
-/* Thinking-dots → first-token handoff: the dots fade out over 400ms while
-   the first text fades in underneath — an overlap, never a swap. */
 @keyframes sf-dots-leave {
   to {
     opacity: 0;
@@ -85,6 +81,83 @@
   animation: sf-text-enter 0.4s ease-out both;
 }
 
+/* --- Tool part states (components/ToolCall.jsx) --- */
+
+@keyframes sf-tool-phase-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sf-tool-phase-in {
+  animation: sf-tool-phase-in 0.22s ease-out both;
+}
+
+/* --- Error state entrance --- */
+
+@keyframes sf-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sf-error-in {
+  animation: sf-error-in 0.25s ease-out both;
+}
+
+/* --- Mobile Safari fixes --- */
+
+/* Prevent rubber-band scroll from propagating past the chat container */
+.chat-messages-container {
+  overscroll-behavior: contain;
+}
+
+/* When the virtual keyboard opens on iOS Safari, prevent the body from
+   scrolling behind the chat interface */
+body.chat-active {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* --- StatefulButton motion (components/StatefulButton.jsx) --- */
+
+/* Spinner CSS fallback for SSR / non-JS */
+@keyframes sf-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sf-btn-spin {
+  animation: sf-btn-spin 0.8s linear infinite;
+}
+
+/* --- Mobile Safari fixes --- */
+
+/* Prevent rubber-band scroll from propagating past the chat container */
+.chat-messages-container {
+  overscroll-behavior: contain;
+}
+
+/* When the virtual keyboard opens on iOS Safari, prevent the body from
+   scrolling behind the chat interface */
+body.chat-active {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-message-in {
     animation: none;
@@ -94,6 +167,15 @@
   }
   .sf-dots-leave,
   .sf-text-enter {
+    animation: none;
+  }
+  .sf-tool-phase-in {
+    animation: none;
+  }
+  .sf-error-in {
+    animation: none;
+  }
+  .sf-btn-spin {
     animation: none;
   }
 }

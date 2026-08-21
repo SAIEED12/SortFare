@@ -130,6 +130,89 @@ lib/                  # Auth config, API client, utilities
 public/               # Static assets
 ```
 
+## Assistant Tool Contract (FE-07)
+
+The SortFare Assistant (`/chat`) can call server-side tools defined in `lib/ai/tools/`. Every tool has a Zod schema (the language model's contract) and an `execute` function (the runtime). Tool calls stream to the client as typed tool parts (`tool-<name>` in `message.parts`), and `components/ToolCall.jsx` renders the lifecycle as four distinct states.
+
+### `searchFlights` — `lib/ai/tools/searchFlights.js`
+
+Searches the in-app catalog (`data/flights.js`) and returns matching flights ranked by the requested sort.
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `origin` | `string` (3-letter code) | — | Optional; omitted = any origin |
+| `destination` | `string` (3-letter code) | — | Optional; omitted = any destination |
+| `maxPrice` | `number` (int > 0) | — | Fare cap in USD |
+| `nonstopOnly` | `boolean` | `false` | Overrides `maxStops` when set |
+| `maxStops` | `number` (0–2) | — | Ignored when `nonstopOnly` is set |
+| `airline` | `string` | — | Exact airline name |
+| `sortBy` | `enum('price' \| 'duration' \| 'departure')` | `'price'` | Ranking applied before limiting |
+| `limit` | `number` (1–10) | `5` | Max results |
+
+**Return shape** — Zod-validated, typed as `tool-searchFlights` output on the client:
+
+```js
+{
+  query: { origin, destination, sortBy, nonstopOnly, maxStops, maxPrice, airline }, // what was executed
+  count: number,                          // 0 when nothing matches the filters
+  flights: [{ id, airline, flightNumber, duration, stops,
+              departure: { time, code }, arrival: { time, code },
+              price, currency, bookingUrl }]
+}
+```
+
+**Errors:** the catalog covers only `JFK → ORD`. Any requested route outside it throws a descriptive error (rendered as the `output-error` state); a covered route with no matches returns `count: 0` (rendered as a designed empty state, not an error).
+
+### `getFlightDetails` — `lib/ai/tools/getFlightDetails.js`
+
+Returns one flight's full details. The model picks between this and `searchFlights` based on the question; the choice is visible in the UI as the tool part streams in.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `flightId` | `number` (int > 0) | Catalog id, e.g. `1` for DL 482 |
+
+**Return shape:** `{ flight: { id, airline, flightNumber, duration, stops, departure: { time, code }, arrival: { time, code }, price, currency, bookingUrl } }`
+
+**Errors:** unknown id throws with the valid id list in the message.
+
+### `fetchUrl` — `lib/ai/tools/fetchUrl.js`
+
+Fetches a web page by URL and returns its text content. Uses the native Node.js `fetch()` API — no external dependencies.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `url` | `string` (valid URL) | The URL to fetch. Must be HTTP or HTTPS. |
+
+**Return shape:**
+
+```js
+{
+  url: string,        // The URL that was fetched
+  title: string|null, // Page title if found in HTML, otherwise null
+  content: string,    // Extracted text content (truncated to ~4000 chars)
+  success: boolean,   // Whether the fetch succeeded
+}
+```
+
+**Errors:** network failures, timeouts (10s), and non-OK HTTP statuses are caught and returned as `success: false` with an error message — never thrown.
+
+### Tool part states and their UI (components/ToolCall.jsx)
+
+| State | User question it answers | Visual treatment |
+|-------|--------------------------|------------------|
+| `input-streaming` | "What is it doing?" | Skeleton shimmer + spinner; args chips appear as they stream in |
+| `input-available` | "With what input?" | Complete query as chips + running spinner |
+| `output-available` | "What came back?" | Real component (`FlightResults` — list, empty state, and an SVG price-by-airline chart), never raw JSON |
+| `output-error` | "What went wrong?" | Designed red failure card with the sanitized error and a suggested fix |
+
+Transitions between states crossfade (`sf-tool-phase-in`, 220ms) inside a stable card frame — no layout jump. `prefers-reduced-motion` disables the animation.
+
+**To demo the error state:** ask "what's the cheapest flight from LAX to SFO?" — the route is outside the catalog and the tool fails on purpose.
+
+### Provider quota note
+
+The assistant runs on a free-tier Gemini API key: **20 model requests per day** for `gemini-3.6-flash` (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`). Every tool step is one request, so a typical comparison question costs 2–3 of the daily 20. When the cap is hit, the model stream fails with a 429 — the chat renders a designed amber "daily free-tier limit reached" card (not a crash) and the quota resets at midnight Pacific. To raise the limit, enable billing for the key at [ai.google.dev/gemini-api](https://ai.google.dev/gemini-api) and update `GEMINI_API_KEY` in `.env.local` and the Vercel environment.
+
 ## License
 
 This project is licensed under the MIT License.
