@@ -10,6 +10,9 @@ jobs:
   unit-and-component:
     name: Unit & Component Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sortfare-client
     steps:
       - uses: actions/checkout@v4
 
@@ -17,6 +20,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: sortfare-client/package-lock.json
 
       - run: npm ci
 
@@ -26,6 +30,9 @@ jobs:
   e2e:
     name: E2E Tests (Playwright)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sortfare-client
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +40,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: sortfare-client/package-lock.json
 
       - run: npm ci
 
