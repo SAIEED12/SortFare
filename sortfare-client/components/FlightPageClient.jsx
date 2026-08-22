@@ -23,7 +23,9 @@ export default function FlightPageClient({ flights }) {
         {filteredFlights.length === 1 ? 'result' : 'results'} found
       </p>
 
-      <FlightList flights={filteredFlights} />
+      <div style={{ minHeight: '200px' }}>
+        <FlightList flights={filteredFlights} />
+      </div>
     </div>
   )
 }

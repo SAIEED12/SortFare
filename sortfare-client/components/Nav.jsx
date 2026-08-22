@@ -30,7 +30,7 @@ export default function Nav() {
           SortFare
         </Link>
 
-        <nav className="hidden lg:flex lg:items-center lg:gap-6">
+        <nav className="hidden lg:flex lg:items-center lg:gap-6" aria-label="Main navigation">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -62,7 +62,7 @@ export default function Nav() {
       </div>
 
       {open && (
-        <nav className="border-t lg:hidden">
+        <nav className="border-t lg:hidden" aria-label="Mobile navigation">
           <div className="space-y-1 px-4 pb-3 pt-2">
             {links.map((link) => (
               <Link

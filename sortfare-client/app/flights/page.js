@@ -17,12 +17,12 @@ export default async function FlightsPage({ searchParams }) {
         <h1 className="text-2xl font-bold mb-6">Flights</h1>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 mb-4">
-            <svg className="h-7 w-7 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-7 w-7 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
             </svg>
           </div>
           <h2 className="text-lg font-semibold text-gray-600">Search for flights</h2>
-          <p className="text-sm text-gray-400 mt-1 max-w-sm">
+          <p className="text-sm text-gray-500 mt-1 max-w-sm">
             Enter your origin, destination, and travel date to compare prices across airlines.
           </p>
           <Link

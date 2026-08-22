@@ -6,7 +6,7 @@ export default function FlightList({ flights }) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <h3 className="text-lg font-semibold text-gray-600">No matching flights</h3>
-        <p className="text-sm text-gray-400 mt-1">Try adjusting your filters to see more results.</p>
+        <p className="text-sm text-gray-500 mt-1">Try adjusting your filters to see more results.</p>
       </div>
     )
   }

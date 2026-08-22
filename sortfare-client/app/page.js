@@ -1,14 +1,8 @@
 import Link from 'next/link'
 import { Card } from '@heroui/react'
-import SearchForm from '@/components/SearchForm'
 import FlightCard from '@/components/FlightCard'
+import GlobeHero from '@/components/GlobeHero'
 import { flights } from '@/data/flights'
-
-const stats = [
-  { value: '50+', label: 'Airlines compared' },
-  { value: '100k+', label: 'Fares scanned daily' },
-  { value: '$0', label: 'Booking fees, ever' },
-]
 
 const steps = [
   {
@@ -90,66 +84,9 @@ const popularFlights = [...flights].sort((a, b) => a.price - b.price).slice(0, 3
 export default function Home() {
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-white">
-        <div className="pointer-events-none absolute -top-32 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-primary-100/60 blur-3xl" />
-        <div className="pointer-events-none absolute right-0 top-1/3 h-64 w-64 rounded-full bg-primary-200/40 blur-3xl" />
+      <GlobeHero />
 
-        <svg
-          className="pointer-events-none absolute right-8 top-16 hidden w-64 text-primary-200 lg:block"
-          viewBox="0 0 260 180"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M8 156C60 138 92 64 152 44s104 4 104 4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeDasharray="4 6"
-            strokeLinecap="round"
-          />
-          <circle cx="8" cy="156" r="4" fill="currentColor" />
-          <circle cx="256" cy="48" r="4" fill="currentColor" />
-          <path
-            d="M176 22l58 14-24 30-34-10-14 12-22-6 36-40z"
-            fill="currentColor"
-            transform="rotate(-8 176 22)"
-          />
-        </svg>
-
-        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 text-center sm:pt-24">
-          <span className="inline-flex items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
-            Compare fares across 50+ airlines
-          </span>
-
-          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-            Find the best fare for{' '}
-            <span className="bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-              every flight
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-2xl text-base text-gray-500 sm:text-lg">
-            Search, compare, and rank flights across airlines by price, duration, and stops.
-            When you find the one, book it directly with the airline.
-          </p>
-
-          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-gray-100 bg-white p-5 shadow-xl shadow-primary-100/50 sm:p-6">
-            <SearchForm />
-          </div>
-
-          <dl className="mx-auto mt-14 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <dt className="sr-only">{stat.label}</dt>
-                <dd className="text-3xl font-bold text-gray-900">{stat.value}</dd>
-                <dd className="mt-1 text-sm text-gray-500">{stat.label}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works">
+      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
             How it works
@@ -168,7 +105,7 @@ export default function Home() {
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
                 {step.icon}
               </div>
-              <span className="mt-4 block text-xs font-semibold text-primary-400">
+              <span className="mt-4 block text-xs font-semibold text-primary-600">
                 Step {step.number}
               </span>
               <h3 className="mt-1 text-lg font-semibold text-gray-900">{step.title}</h3>
@@ -178,7 +115,7 @@ export default function Home() {
         </ol>
       </section>
 
-      <section className="bg-gray-50 py-20" aria-labelledby="features">
+      <section className="bg-gray-50 py-20" aria-labelledby="features" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="mx-auto max-w-7xl px-4">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
@@ -205,7 +142,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals">
+      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
@@ -233,7 +170,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 pb-20">
+      <section className="px-4 pb-20" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
         <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-16 text-center sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Your next flight is one search away
