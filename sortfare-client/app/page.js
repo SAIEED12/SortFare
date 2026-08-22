@@ -86,7 +86,7 @@ export default function Home() {
     <>
       <GlobeHero />
 
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works">
+      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
             How it works
@@ -105,7 +105,7 @@ export default function Home() {
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
                 {step.icon}
               </div>
-              <span className="mt-4 block text-xs font-semibold text-primary-400">
+              <span className="mt-4 block text-xs font-semibold text-primary-600">
                 Step {step.number}
               </span>
               <h3 className="mt-1 text-lg font-semibold text-gray-900">{step.title}</h3>
@@ -115,7 +115,7 @@ export default function Home() {
         </ol>
       </section>
 
-      <section className="bg-gray-50 py-20" aria-labelledby="features">
+      <section className="bg-gray-50 py-20" aria-labelledby="features" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="mx-auto max-w-7xl px-4">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
@@ -142,7 +142,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals">
+      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
@@ -170,7 +170,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 pb-20">
+      <section className="px-4 pb-20" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
         <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-16 text-center sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Your next flight is one search away

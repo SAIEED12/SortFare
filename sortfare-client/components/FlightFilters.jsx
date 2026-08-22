@@ -10,6 +10,7 @@ export default function FlightFilters({ filters, updateFilter, uniqueAirlines })
           selectedKey={filters.stops}
           onSelectionChange={(key) => updateFilter('stops', key)}
           className="w-full"
+          aria-label="Filter by stops"
         >
           <Select.Trigger>
             <Select.Value />
@@ -32,6 +33,7 @@ export default function FlightFilters({ filters, updateFilter, uniqueAirlines })
           selectedKey={filters.airline}
           onSelectionChange={(key) => updateFilter('airline', key)}
           className="w-full"
+          aria-label="Filter by airline"
         >
           <Select.Trigger>
             <Select.Value />
@@ -50,8 +52,9 @@ export default function FlightFilters({ filters, updateFilter, uniqueAirlines })
 
       <div className="flex items-end gap-2">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Min Price</label>
+          <label htmlFor="filter-price-min" className="block text-xs font-medium text-gray-500 mb-1">Min Price</label>
           <input
+            id="filter-price-min"
             type="number"
             value={filters.priceMin}
             onChange={(e) => updateFilter('priceMin', e.target.value)}
@@ -60,8 +63,9 @@ export default function FlightFilters({ filters, updateFilter, uniqueAirlines })
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Max Price</label>
+          <label htmlFor="filter-price-max" className="block text-xs font-medium text-gray-500 mb-1">Max Price</label>
           <input
+            id="filter-price-max"
             type="number"
             value={filters.priceMax}
             onChange={(e) => updateFilter('priceMax', e.target.value)}
@@ -77,6 +81,7 @@ export default function FlightFilters({ filters, updateFilter, uniqueAirlines })
           selectedKey={filters.sortBy}
           onSelectionChange={(key) => updateFilter('sortBy', key)}
           className="w-full"
+          aria-label="Sort flights by"
         >
           <Select.Trigger>
             <Select.Value />

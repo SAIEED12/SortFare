@@ -25,7 +25,7 @@ function ErrorState({ error, onRetry, origin, destination }) {
       <h2 className="text-lg font-semibold text-gray-600">
         {isNetwork ? 'Unable to connect' : 'Failed to load flights'}
       </h2>
-      <p className="text-sm text-gray-400 mt-1 max-w-sm">
+      <p className="text-sm text-gray-500 mt-1 max-w-sm">
         {isNetwork
           ? 'Check your internet connection and try again.'
           : `Unable to fetch flight data for ${origin} → ${destination}. Please try again.`}
@@ -53,12 +53,12 @@ function EmptyState({ origin, destination }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 mb-4">
-        <svg className="h-7 w-7 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="h-7 w-7 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
         </svg>
       </div>
       <h2 className="text-lg font-semibold text-gray-600">No flights found</h2>
-      <p className="text-sm text-gray-400 mt-1 max-w-sm">
+      <p className="text-sm text-gray-500 mt-1 max-w-sm">
         No flights are currently available for {origin} → {destination}.
         Try different dates or airports.
       </p>

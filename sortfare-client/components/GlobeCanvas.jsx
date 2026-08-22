@@ -9,7 +9,7 @@ function LoadingFallback() {
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
-        <p className="text-sm text-gray-400">Loading 3D globe…</p>
+        <p className="text-sm text-gray-500">Loading 3D globe…</p>
       </div>
     </div>
   )

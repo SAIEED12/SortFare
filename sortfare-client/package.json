@@ -38,6 +38,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "jsdom": "^29.0.0",
+    "lighthouse": "^13.4.1",
+    "puppeteer": "^25.8.0",
     "tailwindcss": "^4",
     "vitest": "^4.1.11"
   }

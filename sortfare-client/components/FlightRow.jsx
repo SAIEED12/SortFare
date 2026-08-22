@@ -45,6 +45,7 @@ export default function FlightRow({ flight }) {
               className="rounded-md bg-primary-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-700"
             >
               View deal
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
           </div>
         </div>

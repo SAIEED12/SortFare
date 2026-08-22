@@ -11,7 +11,7 @@ const GlobeCanvas = dynamic(() => import('./GlobeCanvas'), {
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
-        <p className="text-sm text-gray-400">Loading 3D globe…</p>
+        <p className="text-sm text-gray-500">Loading 3D globe…</p>
       </div>
     </div>
   ),
@@ -59,7 +59,7 @@ export default function GlobeHero() {
             </div>
           </div>
 
-          <div className="relative h-[300px] w-full flex-shrink-0 sm:h-[400px] lg:h-[480px] lg:w-[480px]">
+          <div className="relative h-[300px] w-full flex-shrink-0 sm:h-[400px] lg:h-[480px] lg:w-[480px]" role="img" aria-label="Interactive 3D globe showing flight routes between airports">
             {reducedMotion ? (
               <GlobeFallback />
             ) : (

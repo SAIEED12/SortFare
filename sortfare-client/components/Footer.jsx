@@ -61,7 +61,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 border-t border-gray-100 pt-6">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-500">
             &copy; {new Date().getFullYear()} SortFare. All rights reserved.
           </p>
         </div>

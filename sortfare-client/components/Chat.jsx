@@ -65,6 +65,7 @@ const mdComponents = {
       className="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-700"
     >
       {children}
+      <span className="sr-only"> (opens in a new tab)</span>
     </a>
   ),
   h1: ({ children }) => <h1 className="mb-2 text-lg font-bold text-gray-900">{children}</h1>,
@@ -230,14 +231,12 @@ function AssistantMessage({ message, isStreaming }) {
         {(text.length > 0 || hasToolParts) && (
           <div
             className={`text-sm text-gray-800 ${handoff ? 'sf-text-enter' : ''}`}
-            role="log"
-            aria-live="polite"
           >
             {renderedParts}
           </div>
         )}
         {!isStreaming && text.length > 0 && (
-          <p className="mt-2 text-xs text-neutral-400">{message.metadata?.model ?? 'Gemini 2.5 Flash'}</p>
+          <p className="mt-2 text-xs text-neutral-500">{message.metadata?.model ?? 'Gemini 2.5 Flash'}</p>
         )}
       </div>
     </div>
@@ -480,6 +479,9 @@ export default function Chat() {
         ref={scrollRef}
         onScroll={checkAtBottom}
         className="chat-messages-container relative flex-1 overflow-y-auto overscroll-contain bg-neutral-50"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat messages"
       >
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-4">
           {messages.length === 0 && !isBusy && (
@@ -539,6 +541,7 @@ export default function Chat() {
           <button
             type="button"
             onClick={jumpToLatest}
+            aria-label="Jump to latest message"
             className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-lg transition-colors hover:border-primary-300 hover:text-primary-700"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -594,7 +597,7 @@ export default function Chat() {
             </button>
           )}
         </div>
-        <p className="mt-2 px-1 text-center text-[11px] text-neutral-400">
+            <p className="mt-2 px-1 text-center text-[11px] text-neutral-500">
           Enter to send · Shift+Enter for a new line · Streaming can be stopped mid-answer
         </p>
       </form>
