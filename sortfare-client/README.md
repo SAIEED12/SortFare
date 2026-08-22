@@ -5,6 +5,7 @@ Frontend for SortFare — a flight comparison app where users search, compare, a
 ## Tech Stack
 
 - **Framework:** Next.js 15 (App Router), React, Tailwind CSS
+- **3D:** Three.js, React Three Fiber, Drei
 - **Language:** Plain JavaScript (no TypeScript)
 - **UI:** [HeroUI](https://www.heroui.com/) (primary) + [Shadcn UI](https://ui.shadcn.com/) (supplementary primitives)
 - **Auth:** Better Auth (client + Next.js route handlers)
@@ -124,11 +125,59 @@ The client uses Better Auth React hooks to sign in, sign out, and read session s
 app/                  # Next.js App Router pages and layouts
   api/auth/           # Better Auth route handlers (only server-side code)
 components/           # Shared React components
+  GlobeHero.jsx       # 3D globe hero section (lazy-loaded)
+  GlobeCanvas.jsx     # R3F Canvas wrapper
+  GlobeScene.jsx      # 3D scene: earth, arcs, stars, controls
+  FlightArc.jsx       # Curved arc between two airports
+  AnimatedDot.jsx     # Traveling dot along a flight route
+  GlobeFallback.jsx   # Static fallback for reduced-motion / no-JS
   ui/                 # Shadcn UI components
 hooks/                # Custom React hooks
+  usePrefersReducedMotion.js
+data/                 # Flight routes, airports, catalog
+  routes.js           # 8 routes with lat/lng, airline colors
 lib/                  # Auth config, API client, utilities
-public/               # Static assets
+public/
+  textures/           # Earth texture (earth-day.jpg, 245KB)
 ```
+
+## 3D Globe Hero (FE-AA2)
+
+The homepage hero renders an interactive 3D globe showing SortFare's flight routes. Built with React Three Fiber and deployed as part of the landing page.
+
+### What it does
+
+- **Textured earth sphere** with an equirectangular day-map texture
+- **8 flight arcs** curved over the globe surface, each colored by airline brand (British Airways, ANA, Air France, LATAM, Qantas, Emirates, Virgin Atlantic, United)
+- **Animated dots** traveling along each arc (the "meaningful interaction" beyond orbiting)
+- **Hover tooltips** — hover any arc to see the airline name, route, and price in a floating card
+- **Auto-rotate** that pauses when a route is hovered and resumes after
+- **Starfield background** with 2,000 deterministic stars (seeded random, no render-phase impurity)
+- **Orbit controls** — drag to rotate, scroll to zoom, touch works on mobile
+
+### Performance notes
+
+| Asset | Size | Strategy |
+|---|---|---|
+| `three` + `@react-three/fiber` + `@react-three/drei` | ~400KB gzipped | Code-split via `next/dynamic` with `ssr: false` — never touches the server bundle |
+| `earth-day.jpg` | 245KB | Served from `/public/textures/`, cached by CDN |
+| Canvas DPR | capped at 1.5 | Prevents super-sampling on Retina displays |
+| Star positions | module-level `IIFE` | Generated once with deterministic seeded random, not on every render |
+
+Total added weight to the homepage: ~650KB (all client-side, all lazy). First paint is unaffected — the hero text renders immediately, the globe hydrates after.
+
+### Reduced-motion / low-power fallback
+
+Users with `prefers-reduced-motion: reduce` see a static SVG globe illustration instead of the 3D canvas. No auto-rotate, no animated dots. Detection uses `useSyncExternalStore` for zero tearing.
+
+### What I'd add with more time
+
+- **Click-to-select routes** — tap an arc to highlight it and show full flight details in a side panel
+- **Airline filter** — toggle airlines on/off to declutter the globe
+- **Scroll-to-zoom** — map page scroll to camera distance for a scrollytelling experience
+- **More airports** — expand from 8 to 20+ routes with a clustering algorithm for dense regions
+- **Animated plane models** — replace the dot with a small GLB plane model that follows the arc
+- **Bump/specular maps** — add `earth_normal_2048.jpg` and `earth_specular_2048.jpg` for realistic lighting
 
 ## Assistant Tool Contract (FE-07)
 
