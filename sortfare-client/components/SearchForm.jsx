@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Button, Input, Select, ListBox, ListBoxItem } from '@heroui/react'
 
-const QUICK_ROUTES = [
+export const QUICK_ROUTES = [
   { origin: 'JFK', destination: 'ORD', label: 'New York → Chicago' },
   { origin: 'LAX', destination: 'SFO', label: 'Los Angeles → San Francisco' },
   { origin: 'SEA', destination: 'JFK', label: 'Seattle → New York' },

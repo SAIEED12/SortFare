@@ -42,15 +42,21 @@ export default function FlightCard({ flight }) {
             <span className="text-xl font-bold">
               {flight.currency} {flight.price}
             </span>
-            <a
-              href={flight.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-            >
-              View Deal
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+            {flight.bookingUrl ? (
+              <a
+                href={flight.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                View Deal
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            ) : (
+              <span className="inline-flex items-center rounded-lg bg-neutral-100 px-4 py-1.5 text-sm font-medium text-gray-500">
+                Price only
+              </span>
+            )}
           </div>
         </div>
       </Card.Content>

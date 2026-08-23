@@ -12,12 +12,14 @@ import { z } from 'zod'
 import { flights } from '@/data/flights'
 import { flightSchema } from '@/lib/ai/tools/schemas'
 
-// The catalog currently covers a single city pair. If a requested route
-// falls outside it, the tool fails with a designed error — that surfaces as
-// the `output-error` part state in the UI, so reviewers can trigger the
-// failure on purpose without crashing the stream.
-const COVERED_ORIGIN = 'JFK'
-const COVERED_DESTINATION = 'ORD'
+// City pairs actually present in the catalog — derived from the data so
+// the tool's coverage stays in sync with data/flights.js automatically.
+// If a requested route falls outside it, the tool fails with a designed
+// error — that surfaces as the `output-error` part state in the UI, so
+// reviewers can trigger the failure on purpose without crashing the stream.
+const coveredPairs = [
+  ...new Set(flights.map((f) => `${f.departure.code} → ${f.arrival.code}`)),
+]
 
 export const searchFlightsInputSchema = z.object({
   origin: z
@@ -81,14 +83,17 @@ export const searchFlightsOutputSchema = z.object({
 })
 
 function catalogCoversRoute(origin, destination) {
-  if (origin && origin !== COVERED_ORIGIN) return false
-  if (destination && destination !== COVERED_DESTINATION) return false
-  return true
+  if (!origin && !destination) return true
+  return flights.some(
+    (f) =>
+      (!origin || f.departure.code === origin) &&
+      (!destination || f.arrival.code === destination),
+  )
 }
 
 function routeCoverageError(origin, destination) {
   const route = [origin, destination].filter(Boolean).join(' → ')
-  return `The SortFare catalog does not cover ${route}. The sample catalog in this demo only contains ${COVERED_ORIGIN} → ${COVERED_DESTINATION} (JFK to Chicago). Ask about that route, or search the Flights page for live results.`
+  return `The SortFare catalog does not cover ${route}. The sample catalog covers: ${coveredPairs.join(', ')}. Ask about one of those routes, or search the Flights page for live results.`
 }
 
 export const searchFlights = tool({
@@ -97,8 +102,8 @@ export const searchFlights = tool({
     'ranked by the requested sort (price by default).',
     'Use this tool for ANY question about specific flights, fares,',
     'cheapest/fastest options, or comparisons between flights.',
-    `The catalog only covers ${COVERED_ORIGIN} → ${COVERED_DESTINATION}; searching`,
-    'another route fails with an explanatory error.',
+    'The sample catalog covers a limited set of routes; searching',
+    'another route fails with an explanatory error listing them.',
   ].join(' '),
   inputSchema: searchFlightsInputSchema,
   outputSchema: searchFlightsOutputSchema,

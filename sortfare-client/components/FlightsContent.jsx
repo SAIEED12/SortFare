@@ -72,8 +72,25 @@ function EmptyState({ origin, destination }) {
   )
 }
 
+function SampleDataBanner() {
+  return (
+    <div
+      role="status"
+      className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+    >
+      <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" />
+      </svg>
+      <span>
+        Live flight search is unavailable right now &mdash; showing sample data.
+      </span>
+    </div>
+  )
+}
+
 export default function FlightsContent({ origin, destination, date, passengers }) {
   const [flights, setFlights] = useState(null)
+  const [isSample, setIsSample] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -81,8 +98,9 @@ export default function FlightsContent({ origin, destination, date, passengers }
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchFlights({ origin, destination, date, passengers })
-      setFlights(data)
+      const result = await fetchFlights({ origin, destination, date, passengers })
+      setFlights(result.flights)
+      setIsSample(result.source === 'sample')
     } catch (err) {
       setError(err)
     } finally {
@@ -96,8 +114,11 @@ export default function FlightsContent({ origin, destination, date, passengers }
       setLoading(true)
       setError(null)
       try {
-        const data = await fetchFlights({ origin, destination, date, passengers })
-        if (!cancelled) setFlights(data)
+        const result = await fetchFlights({ origin, destination, date, passengers })
+        if (!cancelled) {
+          setFlights(result.flights)
+          setIsSample(result.source === 'sample')
+        }
       } catch (err) {
         if (!cancelled) setError(err)
       } finally {
@@ -121,7 +142,12 @@ export default function FlightsContent({ origin, destination, date, passengers }
   }
 
   if (flights) {
-    return <FlightPageClient flights={flights} />
+    return (
+      <>
+        {isSample ? <SampleDataBanner /> : null}
+        <FlightPageClient flights={flights} />
+      </>
+    )
   }
 
   return <FlightSkeleton />
