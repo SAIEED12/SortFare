@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Card } from '@heroui/react'
 import FlightCard from '@/components/FlightCard'
 import GlobeHero from '@/components/GlobeHero'
+import ShaderHero from '@/components/ShaderHero'
 import { flights } from '@/data/flights'
 
 const steps = [
@@ -84,6 +85,7 @@ const popularFlights = [...flights].sort((a, b) => a.price - b.price).slice(0, 3
 export default function Home() {
   return (
     <>
+      <ShaderHero />
       <GlobeHero />
 
       <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
