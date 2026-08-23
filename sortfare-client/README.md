@@ -1,20 +1,38 @@
 # SortFare Client
 
-Frontend for SortFare — a flight comparison app where users search, compare, and rank flights across airlines by price, duration, and stops. Users are linked out to airline sites to complete purchase; there is no booking or payment in this app.
+A flight comparison app where users search, compare, and rank flights across airlines by price, duration, and stops. Users are linked out to airline sites to complete purchase — no booking, no fees, no middleman.
+
+**Live Demo:** https://sortfare-client.vercel.app
+
+<!-- Replace with actual screenshot URLs -->
+<!-- ![Homepage with 3D globe hero](screenshots/home.png) -->
+<!-- ![Flight search and comparison](screenshots/flights.png) -->
+<!-- ![AI chat assistant](screenshots/chat.png) -->
+
+## What It Does
+
+- **Flight Search** — Enter origin, destination, date, and travelers to see options from across airlines in one view
+- **Compare & Rank** — Sort results by price, duration, or departure time; filter by airline and number of stops
+- **Save Flights** — Keep a shortlist of favorites and compare them anytime (requires account)
+- **AI Assistant** — Chat with an AI that searches the flight catalog, compares options, and shares travel tips
+- **3D Globe Hero** — Interactive Three.js globe showing flight routes with animated arcs and tooltips
+- **Direct Booking** — One-click links to airline sites to complete purchases at listed fares
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router), React, Tailwind CSS
-- **3D:** Three.js, React Three Fiber, Drei
-- **Language:** Plain JavaScript (no TypeScript)
-- **UI:** [HeroUI](https://www.heroui.com/) (primary) + [Shadcn UI](https://ui.shadcn.com/) (supplementary primitives)
-- **Auth:** Better Auth (client + Next.js route handlers)
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 15 (App Router), React |
+| Styling | Tailwind CSS |
+| UI Components | HeroUI (primary) + Shadcn UI (supplementary) |
+| 3D Graphics | Three.js, React Three Fiber, Drei |
+| Auth | Better Auth (client + Next.js route handlers) |
+| AI | Google Gemini (`gemini-3.6-flash`) via Vercel AI SDK |
+| Language | JavaScript (no TypeScript) |
 
 ## Architecture
 
 This repository is **frontend-only**. Business logic and flight data APIs live in a separate SortFare server repository. This app consumes that API via `NEXT_PUBLIC_API_URL`.
-
-Authentication runs in this repo through Better Auth catch-all route handlers under `app/api/auth/`. That is the only server-side code allowed here — no Express, no business REST endpoints, no backend validation logic.
 
 ```
 SortFare-Client (this repo)          Separate server repo
@@ -25,41 +43,49 @@ Better Auth route handlers           Business logic
 Client fetch → NEXT_PUBLIC_API_URL
 ```
 
-The frontend dev server can run independently for UI work. Flight search features require the external API server to be running.
+The AI chat assistant (`/chat`) runs server-side tool calls via `/api/chat` route handlers. It uses a local flight catalog (`data/flights.js`) for demo data and can fetch external URLs via the `fetchUrl` tool.
 
-## Prerequisites
+### Key Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page with 3D globe hero, features, popular deals |
+| `/flights` | Flight search and comparison page |
+| `/chat` | AI assistant for flight questions and travel tips |
+| `/health` | API connectivity health check |
+| `/login`, `/signup` | Authentication pages |
+
+## Getting Started
+
+### Prerequisites
 
 - Node.js 18+
 - npm, yarn, or pnpm
 
-## Getting Started
-
-### Install dependencies
+### Install
 
 ```bash
+git clone https://github.com/your-username/SortFare-Client.git
+cd SortFare-Client/sortfare-client
 npm install
 ```
 
-### Environment variables
+### Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in the values:
 
-```env
-# External SortFare API (separate server repo)
-NEXT_PUBLIC_API_URL=http://localhost:4000
-
-# Better Auth (Next.js route handlers in this repo)
-BETTER_AUTH_SECRET=your-secret-here
-BETTER_AUTH_URL=http://localhost:3000
+```bash
+cp .env.example .env.local
 ```
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_API_URL` | Base URL of the separate SortFare API server |
-| `BETTER_AUTH_SECRET` | Secret key for Better Auth session signing |
-| `BETTER_AUTH_URL` | Base URL of this Next.js app (where auth routes are served) |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_API_URL` | Base URL of the separate SortFare API server | Yes (for live search) |
+| `BETTER_AUTH_SECRET` | Secret key for Better Auth session signing | Yes |
+| `BETTER_AUTH_URL` | Base URL of this Next.js app | Yes |
+| `GEMINI_API_KEY` | Google Gemini API key for AI assistant | Yes (for chat) |
 
-If Better Auth uses a database adapter, add the adapter-specific variable when auth is scaffolded (e.g. `MONGODB_URI` for a Mongo adapter) — scoped to auth only.
+> **Note:** The flight search page requires the external API server. The AI chat uses a local catalog for demo purposes.
 
 ### Development
 
@@ -67,201 +93,128 @@ If Better Auth uses a database adapter, add the adapter-specific variable when a
 npm run dev
 ```
 
-The app runs at [http://localhost:3000](http://localhost:3000). Ensure the external API server is running at the URL set in `NEXT_PUBLIC_API_URL` for flight search to work.
+The app runs at [http://localhost:3000](http://localhost:3000).
 
-### Other scripts
-
-```bash
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # Run ESLint
-```
-
-## UI Setup
-
-**HeroUI** — wrap the root layout with the HeroUI provider:
-
-```jsx
-import { HeroUIProvider } from "@heroui/react";
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        <HeroUIProvider>{children}</HeroUIProvider>
-      </body>
-    </html>
-  );
-}
-```
-
-**Shadcn UI** — initialize with JavaScript (uses `jsconfig.json` for path aliases):
+### Production Build
 
 ```bash
-npx shadcn@latest init
+npm run build
+npm run start
 ```
-
-Add components as needed:
-
-```bash
-npx shadcn@latest add button dialog
-```
-
-Prefer HeroUI for primary UI; reach for Shadcn when HeroUI lacks a specific primitive.
-
-## Auth Setup
-
-Better Auth runs via a catch-all route handler:
-
-```
-app/api/auth/[...all]/route.js
-```
-
-The client uses Better Auth React hooks to sign in, sign out, and read session state. Auth config and any database adapter live in `lib/auth.js`.
 
 ## Project Structure
 
 ```
-app/                  # Next.js App Router pages and layouts
-  api/auth/           # Better Auth route handlers (only server-side code)
-components/           # Shared React components
-  GlobeHero.jsx       # 3D globe hero section (lazy-loaded)
-  GlobeCanvas.jsx     # R3F Canvas wrapper
-  GlobeScene.jsx      # 3D scene: earth, arcs, stars, controls
-  FlightArc.jsx       # Curved arc between two airports
-  AnimatedDot.jsx     # Traveling dot along a flight route
-  GlobeFallback.jsx   # Static fallback for reduced-motion / no-JS
-  ui/                 # Shadcn UI components
-hooks/                # Custom React hooks
-  usePrefersReducedMotion.js
-data/                 # Flight routes, airports, catalog
-  routes.js           # 8 routes with lat/lng, airline colors
-lib/                  # Auth config, API client, utilities
-public/
-  textures/           # Earth texture (earth-day.jpg, 245KB)
+sortfare-client/
+├── app/                    # Next.js App Router pages and layouts
+│   ├── api/chat/           # AI streaming chat route handler
+│   ├── chat/               # Chat page
+│   ├── flights/            # Flight search page
+│   ├── health/             # API health check
+│   ├── login/, signup/     # Auth pages
+│   └── page.js             # Landing page
+├── components/             # React components
+│   ├── GlobeHero.jsx       # 3D globe hero (Three.js)
+│   ├── GlobeScene.jsx      # Globe scene with arcs and stars
+│   ├── FlightArc.jsx       # Curved arc between airports
+│   ├── ShaderHero.jsx      # Shader-based hero animation
+│   ├── Chat.jsx            # AI chat interface
+│   ├── ToolCall.jsx        # Tool call renderer for chat
+│   ├── FlightCard.jsx      # Flight result card
+│   └── Nav.jsx, Footer.jsx
+├── data/                   # Flight routes and catalog
+│   ├── flights.js          # 8 demo flights (JFK → ORD)
+│   └── routes.js           # Airport coordinates and airline colors
+├── hooks/                  # Custom React hooks
+│   └── usePrefersReducedMotion.js
+├── lib/                    # Utilities and config
+│   ├── ai/                 # AI model, tools, and MCP client
+│   │   ├── model.js        # Gemini model config and system prompt
+│   │   ├── mcp.js          # MCP client factory
+│   │   └── tools/          # searchFlights, getFlightDetails, fetchUrl
+│   └── auth.js             # Better Auth config
+└── public/textures/        # Earth texture (earth-day.jpg)
 ```
 
-## 3D Globe Hero (FE-AA2)
+## Design Decisions
 
-The homepage hero renders an interactive 3D globe showing SortFare's flight routes. Built with React Three Fiber and deployed as part of the landing page.
+### Why Next.js App Router?
+Server components reduce client bundle size. The AI chat route handler streams responses server-side without exposing the API key. Route handlers for auth stay co-located with the app.
 
-### What it does
+### Why HeroUI + Shadcn?
+HeroUI provides the primary design system with consistent theming. Shadcn fills gaps where HeroUI lacks specific primitives (like certain dialog patterns). This avoids building everything from scratch.
 
-- **Textured earth sphere** with an equirectangular day-map texture
-- **8 flight arcs** curved over the globe surface, each colored by airline brand (British Airways, ANA, Air France, LATAM, Qantas, Emirates, Virgin Atlantic, United)
-- **Animated dots** traveling along each arc (the "meaningful interaction" beyond orbiting)
-- **Hover tooltips** — hover any arc to see the airline name, route, and price in a floating card
-- **Auto-rotate** that pauses when a route is hovered and resumes after
-- **Starfield background** with 2,000 deterministic stars (seeded random, no render-phase impurity)
-- **Orbit controls** — drag to rotate, scroll to zoom, touch works on mobile
+### Why No TypeScript?
+The project started as a rapid prototype. JavaScript with JSDoc comments and Zod schemas (for API contracts) provides sufficient type safety without the compilation step overhead.
 
-### Performance notes
+### Why Gemini?
+The free tier (20 requests/day) is sufficient for a demo. The AI SDK's Google provider integrates cleanly with the Vercel AI SDK streaming protocol.
 
-| Asset | Size | Strategy |
-|---|---|---|
-| `three` + `@react-three/fiber` + `@react-three/drei` | ~400KB gzipped | Code-split via `next/dynamic` with `ssr: false` — never touches the server bundle |
-| `earth-day.jpg` | 245KB | Served from `/public/textures/`, cached by CDN |
-| Canvas DPR | capped at 1.5 | Prevents super-sampling on Retina displays |
-| Star positions | module-level `IIFE` | Generated once with deterministic seeded random, not on every render |
+### Why Local Catalog for AI?
+The AI assistant uses a local flight catalog (`data/flights.js`) instead of the external API. This makes the chat self-contained for demos and avoids coupling the AI to a running backend server.
 
-Total added weight to the homepage: ~650KB (all client-side, all lazy). First paint is unaffected — the hero text renders immediately, the globe hydrates after.
+## AI Assistant Details
 
-### Reduced-motion / low-power fallback
+### Tools
 
-Users with `prefers-reduced-motion: reduce` see a static SVG globe illustration instead of the 3D canvas. No auto-rotate, no animated dots. Detection uses `useSyncExternalStore` for zero tearing.
+The assistant has three tools:
 
-### What I'd add with more time
+| Tool | Purpose | Input |
+|------|---------|-------|
+| `searchFlights` | Search the flight catalog | origin, destination, maxPrice, stops, airline, sortBy, limit |
+| `getFlightDetails` | Get one flight's full details | flightId |
+| `fetchUrl` | Fetch and extract web page content | url |
 
-- **Click-to-select routes** — tap an arc to highlight it and show full flight details in a side panel
-- **Airline filter** — toggle airlines on/off to declutter the globe
-- **Scroll-to-zoom** — map page scroll to camera distance for a scrollytelling experience
-- **More airports** — expand from 8 to 20+ routes with a clustering algorithm for dense regions
-- **Animated plane models** — replace the dot with a small GLB plane model that follows the arc
-- **Bump/specular maps** — add `earth_normal_2048.jpg` and `earth_specular_2048.jpg` for realistic lighting
+### Tool Part States
 
-## Assistant Tool Contract (FE-07)
+The chat UI renders tool calls in four states:
 
-The SortFare Assistant (`/chat`) can call server-side tools defined in `lib/ai/tools/`. Every tool has a Zod schema (the language model's contract) and an `execute` function (the runtime). Tool calls stream to the client as typed tool parts (`tool-<name>` in `message.parts`), and `components/ToolCall.jsx` renders the lifecycle as four distinct states.
+1. **Input streaming** — Skeleton shimmer + spinner as arguments arrive
+2. **Input available** — Complete query shown as chips + running spinner
+3. **Output available** — Real component (flight results list, chart, or extracted text)
+4. **Output error** — Red failure card with sanitized error message
 
-### `searchFlights` — `lib/ai/tools/searchFlights.js`
+### Provider Quota
 
-Searches the in-app catalog (`data/flights.js`) and returns matching flights ranked by the requested sort.
+The Gemini free tier allows **20 model requests per day**. Each tool step counts as one request, so a typical comparison costs 2–3 requests. When the cap is hit, the chat renders an amber "limit reached" card. Quota resets at midnight Pacific.
 
-| Field | Type | Default | Notes |
-|-------|------|---------|-------|
-| `origin` | `string` (3-letter code) | — | Optional; omitted = any origin |
-| `destination` | `string` (3-letter code) | — | Optional; omitted = any destination |
-| `maxPrice` | `number` (int > 0) | — | Fare cap in USD |
-| `nonstopOnly` | `boolean` | `false` | Overrides `maxStops` when set |
-| `maxStops` | `number` (0–2) | — | Ignored when `nonstopOnly` is set |
-| `airline` | `string` | — | Exact airline name |
-| `sortBy` | `enum('price' \| 'duration' \| 'departure')` | `'price'` | Ranking applied before limiting |
-| `limit` | `number` (1–10) | `5` | Max results |
+## How AI Tools Built This
 
-**Return shape** — Zod-validated, typed as `tool-searchFlights` output on the client:
+**Claude (Anthropic)** was used for architectural planning and design decisions. It helped structure the project, choose between Next.js patterns, and design the tool contract for the AI assistant.
 
-```js
-{
-  query: { origin, destination, sortBy, nonstopOnly, maxStops, maxPrice, airline }, // what was executed
-  count: number,                          // 0 when nothing matches the filters
-  flights: [{ id, airline, flightNumber, duration, stops,
-              departure: { time, code }, arrival: { time, code },
-              price, currency, bookingUrl }]
-}
+**Opencode** was used for writing and fixing code. It generated component implementations, debugged Three.js issues, set up the Vercel AI SDK integration, and handled refactoring across files.
+
+**Google Gemini** is the runtime AI provider. The free API key powers the chat assistant in production.
+
+### What was manual
+
+- Testing across browsers (Chrome, Firefox, Safari)
+- Performance profiling and bundle analysis
+- Accessibility auditing with Lighthouse
+- Writing the system prompt and tool descriptions
+- Final README and documentation
+
+### Limitations encountered
+
+- Gemini's free tier (20 req/day) limits demo availability
+- The flight catalog is hardcoded to JFK → ORD for demo purposes
+- Three.js bundle size (~400KB gzipped) required careful code-splitting with `next/dynamic`
+
+## Known Limitations
+
+- **Demo catalog** — Only covers JFK → ORD routes. Other routes show an explanatory error.
+- **AI quota** — Gemini free tier allows 20 requests/day. Production use requires a paid plan.
+- **No payment** — Users are directed to airline sites; no booking or payment processing.
+- **External API dependency** — Flight search page requires the separate SortFare API server running.
+
+## Running Tests
+
+```bash
+npm run test        # Run Vitest unit tests
+npm run test:watch  # Run tests in watch mode
+npm run lint        # Run ESLint
 ```
-
-**Errors:** the catalog covers only `JFK → ORD`. Any requested route outside it throws a descriptive error (rendered as the `output-error` state); a covered route with no matches returns `count: 0` (rendered as a designed empty state, not an error).
-
-### `getFlightDetails` — `lib/ai/tools/getFlightDetails.js`
-
-Returns one flight's full details. The model picks between this and `searchFlights` based on the question; the choice is visible in the UI as the tool part streams in.
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `flightId` | `number` (int > 0) | Catalog id, e.g. `1` for DL 482 |
-
-**Return shape:** `{ flight: { id, airline, flightNumber, duration, stops, departure: { time, code }, arrival: { time, code }, price, currency, bookingUrl } }`
-
-**Errors:** unknown id throws with the valid id list in the message.
-
-### `fetchUrl` — `lib/ai/tools/fetchUrl.js`
-
-Fetches a web page by URL and returns its text content. Uses the native Node.js `fetch()` API — no external dependencies.
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `url` | `string` (valid URL) | The URL to fetch. Must be HTTP or HTTPS. |
-
-**Return shape:**
-
-```js
-{
-  url: string,        // The URL that was fetched
-  title: string|null, // Page title if found in HTML, otherwise null
-  content: string,    // Extracted text content (truncated to ~4000 chars)
-  success: boolean,   // Whether the fetch succeeded
-}
-```
-
-**Errors:** network failures, timeouts (10s), and non-OK HTTP statuses are caught and returned as `success: false` with an error message — never thrown.
-
-### Tool part states and their UI (components/ToolCall.jsx)
-
-| State | User question it answers | Visual treatment |
-|-------|--------------------------|------------------|
-| `input-streaming` | "What is it doing?" | Skeleton shimmer + spinner; args chips appear as they stream in |
-| `input-available` | "With what input?" | Complete query as chips + running spinner |
-| `output-available` | "What came back?" | Real component (`FlightResults` — list, empty state, and an SVG price-by-airline chart), never raw JSON |
-| `output-error` | "What went wrong?" | Designed red failure card with the sanitized error and a suggested fix |
-
-Transitions between states crossfade (`sf-tool-phase-in`, 220ms) inside a stable card frame — no layout jump. `prefers-reduced-motion` disables the animation.
-
-**To demo the error state:** ask "what's the cheapest flight from LAX to SFO?" — the route is outside the catalog and the tool fails on purpose.
-
-### Provider quota note
-
-The assistant runs on a free-tier Gemini API key: **20 model requests per day** for `gemini-3.6-flash` (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`). Every tool step is one request, so a typical comparison question costs 2–3 of the daily 20. When the cap is hit, the model stream fails with a 429 — the chat renders a designed amber "daily free-tier limit reached" card (not a crash) and the quota resets at midnight Pacific. To raise the limit, enable billing for the key at [ai.google.dev/gemini-api](https://ai.google.dev/gemini-api) and update `GEMINI_API_KEY` in `.env.local` and the Vercel environment.
 
 ## License
 
-This project is licensed under the MIT License.
+MIT
