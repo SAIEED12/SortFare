@@ -5,15 +5,25 @@ import {
   normalizeFlight,
   fetchFlights,
 } from '@/lib/api'
-import { QUICK_ROUTES } from '@/components/SearchForm'
+
+vi.mock('@/lib/ignav', () => ({
+  searchOneWay: vi.fn(),
+  searchRoundTrip: vi.fn(),
+}))
 
 const ORIGINAL_API_URL = process.env.NEXT_PUBLIC_API_URL
+const ORIGINAL_IGNAV_KEY = process.env.IGNAV_API_KEY
 
 afterEach(() => {
   if (ORIGINAL_API_URL === undefined) {
     delete process.env.NEXT_PUBLIC_API_URL
   } else {
     process.env.NEXT_PUBLIC_API_URL = ORIGINAL_API_URL
+  }
+  if (ORIGINAL_IGNAV_KEY === undefined) {
+    delete process.env.IGNAV_API_KEY
+  } else {
+    process.env.IGNAV_API_KEY = ORIGINAL_IGNAV_KEY
   }
   vi.unstubAllGlobals()
 })
@@ -137,12 +147,32 @@ describe('normalizeFlight', () => {
 })
 
 describe('fetchFlights', () => {
-  it('normalizes live API results', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    const fetchMock = vi.fn().mockResolvedValue(
-      jsonResponse({ flights: [SAMPLE_OFFER], count: 1 }),
-    )
-    vi.stubGlobal('fetch', fetchMock)
+  it('normalizes Ignav API results', async () => {
+    process.env.IGNAV_API_KEY = 'test-key'
+    const { searchOneWay } = await import('@/lib/ignav')
+    searchOneWay.mockResolvedValue({
+      itineraries: [
+        {
+          ignav_id: 'ig-123',
+          outbound: {
+            carrier: 'Duffel Airways',
+            duration_minutes: 180,
+            segments: [
+              {
+                flight_number: 'DA100',
+                operating_carrier_name: 'Duffel Airways',
+                departure_airport: 'LAX',
+                departure_time_local: '2026-09-05T08:00:00',
+                arrival_airport: 'SFO',
+                arrival_time_local: '2026-09-05T11:00:00',
+                duration_minutes: 180,
+              },
+            ],
+          },
+          price: { amount: 189.5, currency: 'USD' },
+        },
+      ],
+    })
 
     const result = await fetchFlights({
       origin: 'LAX',
@@ -151,28 +181,32 @@ describe('fetchFlights', () => {
       passengers: '1',
     })
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:4000/flights/search?origin=LAX&destination=SFO&departureDate=2026-09-05&adults=1',
-      { headers: { Accept: 'application/json' } },
-    )
+    expect(searchOneWay).toHaveBeenCalledWith({
+      origin: 'LAX',
+      destination: 'SFO',
+      departureDate: '2026-09-05',
+      adults: 1,
+    })
     expect(result.source).toBe('live')
     expect(result.flights).toHaveLength(1)
     expect(result.flights[0].airline).toBe('Duffel Airways')
     expect(result.flights[0].price).toBe(189.5)
   })
 
-  it('treats a successful response without a flights array as empty', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ error: 'nope' })))
+  it('treats a successful Ignav response without itineraries as empty', async () => {
+    process.env.IGNAV_API_KEY = 'test-key'
+    const { searchOneWay } = await import('@/lib/ignav')
+    searchOneWay.mockResolvedValue({})
 
     const result = await fetchFlights({ origin: 'JFK', destination: 'ORD' })
     expect(result.source).toBe('live')
     expect(result.flights).toEqual([])
   })
 
-  it('falls back to the sample catalog on HTTP errors', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 500 })))
+  it('falls back to the sample catalog on Ignav API errors', async () => {
+    process.env.IGNAV_API_KEY = 'test-key'
+    const { searchOneWay } = await import('@/lib/ignav')
+    searchOneWay.mockRejectedValue(new Error('API error'))
 
     const result = await fetchFlights({ origin: 'JFK', destination: 'ORD' })
     expect(result.source).toBe('sample')
@@ -180,30 +214,20 @@ describe('fetchFlights', () => {
     expect(result.flights[0].departure.code).toBe('JFK')
   })
 
-  it('falls back to the sample catalog on non-JSON payloads', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(jsonResponse('<html>502</html>', { contentType: 'text/html' })),
-    )
+  it('falls back to the sample catalog when no API key is configured', async () => {
+    delete process.env.IGNAV_API_KEY
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
 
     const result = await fetchFlights({ origin: 'JFK', destination: 'ORD' })
-    expect(result.source).toBe('sample')
-    expect(result.flights.length).toBeGreaterThan(0)
-  })
 
-  it('falls back to the sample catalog when the server is unreachable', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
-
-    const result = await fetchFlights({ origin: 'JFK', destination: 'ORD' })
+    expect(fetchMock).not.toHaveBeenCalled()
     expect(result.source).toBe('sample')
     expect(result.flights.length).toBeGreaterThan(0)
   })
 
   it('sample fallback stays honest for routes the catalog does not cover', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://localhost:4000'
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    delete process.env.IGNAV_API_KEY
 
     const result = await fetchFlights({ origin: 'DFW', destination: 'BOS' })
     expect(result.source).toBe('sample')
@@ -211,6 +235,7 @@ describe('fetchFlights', () => {
   })
 
   it('never calls the network when no API URL is configured', async () => {
+    delete process.env.IGNAV_API_KEY
     delete process.env.NEXT_PUBLIC_API_URL
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
@@ -223,10 +248,18 @@ describe('fetchFlights', () => {
   })
 })
 
-describe('sample catalog covers every quick route', () => {
-  it.each(QUICK_ROUTES.map((route) => [`${route.origin}-${route.destination}`, route]))(
+describe('sample catalog covers standard routes', () => {
+  const routes = [
+    { origin: 'JFK', destination: 'ORD' },
+    { origin: 'LAX', destination: 'SFO' },
+    { origin: 'SEA', destination: 'JFK' },
+    { origin: 'MIA', destination: 'LAX' },
+  ]
+
+  it.each(routes.map((r) => [`${r.origin}-${r.destination}`, r]))(
     'returns matching sample flights for %s',
     async (_label, route) => {
+      delete process.env.IGNAV_API_KEY
       delete process.env.NEXT_PUBLIC_API_URL
 
       const result = await fetchFlights({

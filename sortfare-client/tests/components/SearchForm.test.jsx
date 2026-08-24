@@ -25,6 +25,10 @@ vi.mock('@heroui/react', async () => {
   }
 })
 
+vi.mock('@/lib/api', () => ({
+  fetchAirportSuggestions: vi.fn().mockResolvedValue([]),
+}))
+
 import SearchForm from '@/components/SearchForm'
 
 afterEach(() => {
@@ -45,12 +49,10 @@ describe('SearchForm component', () => {
     expect(screen.getByRole('button', { name: /search flights/i })).toBeInTheDocument()
   })
 
-  it('renders quick route buttons', () => {
+  it('renders trip type toggle buttons', () => {
     render(<SearchForm />)
-    expect(screen.getByText('New York → Chicago')).toBeInTheDocument()
-    expect(screen.getByText('Los Angeles → San Francisco')).toBeInTheDocument()
-    expect(screen.getByText('Seattle → New York')).toBeInTheDocument()
-    expect(screen.getByText('Miami → Los Angeles')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /one-way/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /round-trip/i })).toBeInTheDocument()
   })
 
   it('origin input accepts text', async () => {
@@ -61,11 +63,11 @@ describe('SearchForm component', () => {
     expect(originInput).toHaveValue('JFK')
   })
 
-  it('quick route button populates origin and destination', async () => {
+  it('switching to round-trip shows return date field', async () => {
     const user = userEvent.setup()
     render(<SearchForm />)
-    await user.click(screen.getByText('New York → Chicago'))
-    expect(screen.getByLabelText('From')).toHaveValue('JFK')
-    expect(screen.getByLabelText('To')).toHaveValue('ORD')
+    expect(screen.queryByLabelText('Return Date')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /round-trip/i }))
+    expect(screen.getByLabelText('Return Date')).toBeInTheDocument()
   })
 })

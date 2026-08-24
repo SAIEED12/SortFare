@@ -1,41 +1,118 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button, Input, Select, ListBox, ListBoxItem } from '@heroui/react'
-
-export const QUICK_ROUTES = [
-  { origin: 'JFK', destination: 'ORD', label: 'New York → Chicago' },
-  { origin: 'LAX', destination: 'SFO', label: 'Los Angeles → San Francisco' },
-  { origin: 'SEA', destination: 'JFK', label: 'Seattle → New York' },
-  { origin: 'MIA', destination: 'LAX', label: 'Miami → Los Angeles' },
-]
+import { fetchAirportSuggestions } from '@/lib/api'
 
 export default function SearchForm() {
+  const [tripType, setTripType] = useState('oneway')
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
   const [date, setDate] = useState('')
+  const [returnDate, setReturnDate] = useState('')
   const [passengers, setPassengers] = useState('1')
+
+  const [originQuery, setOriginQuery] = useState('')
+  const [destinationQuery, setDestinationQuery] = useState('')
+  const [originSuggestions, setOriginSuggestions] = useState([])
+  const [destinationSuggestions, setDestinationSuggestions] = useState([])
+  const [showOriginDropdown, setShowOriginDropdown] = useState(false)
+  const [showDestDropdown, setShowDestDropdown] = useState(false)
+
+  const originRef = useRef(null)
+  const destRef = useRef(null)
 
   const swap = () => {
     setOrigin(destination)
-    setDestination(origin)
-  }
-
-  const applyRoute = (route) => {
-    setOrigin(route.origin)
-    setDestination(route.destination)
+    setDestination(destinationQuery)
+    setDestinationQuery(originQuery)
+    setOriginQuery(origin)
   }
 
   const today = new Date().toISOString().split('T')[0]
+
+  const debouncedSearch = useCallback(async (query, setSuggestions, setShowDropdown) => {
+    if (query.length >= 2) {
+      const results = await fetchAirportSuggestions(query)
+      setSuggestions(results)
+      setShowDropdown(true)
+    } else {
+      setSuggestions([])
+      setShowDropdown(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      debouncedSearch(originQuery, setOriginSuggestions, setShowOriginDropdown)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [originQuery, debouncedSearch])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      debouncedSearch(destinationQuery, setDestinationSuggestions, setShowDestDropdown)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [destinationQuery, debouncedSearch])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (originRef.current && !originRef.current.contains(e.target)) {
+        setShowOriginDropdown(false)
+      }
+      if (destRef.current && !destRef.current.contains(e.target)) {
+        setShowDestDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const selectAirport = (airport, setQuery, setCode, setShowDropdown) => {
+    setQuery(airport.code)
+    setCode(airport.code)
+    setShowDropdown(false)
+  }
 
   return (
     <form action="/flights" method="GET">
       <input type="hidden" name="origin" value={origin} />
       <input type="hidden" name="destination" value={destination} />
       <input type="hidden" name="date" value={date} />
+      <input type="hidden" name="returnDate" value={tripType === 'roundtrip' ? returnDate : ''} />
       <input type="hidden" name="passengers" value={passengers} />
+      <input type="hidden" name="tripType" value={tripType} />
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Trip Type</label>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setTripType('oneway')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tripType === 'oneway'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            One-way
+          </button>
+          <button
+            type="button"
+            onClick={() => setTripType('roundtrip')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tripType === 'roundtrip'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Round-trip
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr]">
-        <div>
+        <div ref={originRef} className="relative">
           <label htmlFor="sf-origin" className="block text-sm font-medium text-gray-700">
             From
           </label>
@@ -43,11 +120,32 @@ export default function SearchForm() {
             id="sf-origin"
             type="text"
             required
-            placeholder="e.g. JFK"
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+            placeholder="Type city or airport"
+            value={originQuery}
+            onChange={(e) => {
+              setOriginQuery(e.target.value)
+              setOrigin('')
+            }}
+            onFocus={() => originQuery.length >= 2 && setShowOriginDropdown(true)}
             className="mt-1 w-full"
+            autoComplete="off"
           />
+          {showOriginDropdown && originSuggestions.length > 0 && (
+            <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto">
+              {originSuggestions.map((airport) => (
+                <button
+                  key={airport.code}
+                  type="button"
+                  onClick={() => selectAirport(airport, setOriginQuery, setOrigin, setShowOriginDropdown)}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                >
+                  <div className="font-medium text-sm">{airport.code}</div>
+                  <div className="text-xs text-gray-500">{airport.name}</div>
+                  <div className="text-xs text-gray-400">{airport.city}, {airport.country}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="hidden items-end sm:flex">
@@ -64,7 +162,7 @@ export default function SearchForm() {
           </Button>
         </div>
 
-        <div>
+        <div ref={destRef} className="relative">
           <label htmlFor="sf-destination" className="block text-sm font-medium text-gray-700">
             To
           </label>
@@ -72,18 +170,39 @@ export default function SearchForm() {
             id="sf-destination"
             type="text"
             required
-            placeholder="e.g. ORD"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value.toUpperCase())}
+            placeholder="Type city or airport"
+            value={destinationQuery}
+            onChange={(e) => {
+              setDestinationQuery(e.target.value)
+              setDestination('')
+            }}
+            onFocus={() => destinationQuery.length >= 2 && setShowDestDropdown(true)}
             className="mt-1 w-full"
+            autoComplete="off"
           />
+          {showDestDropdown && destinationSuggestions.length > 0 && (
+            <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto">
+              {destinationSuggestions.map((airport) => (
+                <button
+                  key={airport.code}
+                  type="button"
+                  onClick={() => selectAirport(airport, setDestinationQuery, setDestination, setShowDestDropdown)}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                >
+                  <div className="font-medium text-sm">{airport.code}</div>
+                  <div className="text-xs text-gray-500">{airport.name}</div>
+                  <div className="text-xs text-gray-400">{airport.city}, {airport.country}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="sf-date" className="block text-sm font-medium text-gray-700">
-            Date
+            {tripType === 'roundtrip' ? 'Departure Date' : 'Date'}
           </label>
           <Input
             id="sf-date"
@@ -94,6 +213,22 @@ export default function SearchForm() {
             className="mt-1 w-full"
           />
         </div>
+
+        {tripType === 'roundtrip' && (
+          <div>
+            <label htmlFor="sf-return-date" className="block text-sm font-medium text-gray-700">
+              Return Date
+            </label>
+            <Input
+              id="sf-return-date"
+              type="date"
+              min={date || today}
+              value={returnDate}
+              onChange={(e) => setReturnDate(e.target.value)}
+              className="mt-1 w-full"
+            />
+          </div>
+        )}
 
         <div>
           <label htmlFor="sf-passengers" className="block text-sm font-medium text-gray-700">
@@ -129,20 +264,6 @@ export default function SearchForm() {
       >
         Search Flights
       </Button>
-
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <span className="text-xs font-medium text-gray-500">Popular:</span>
-        {QUICK_ROUTES.map((route) => (
-          <button
-            key={route.label}
-            type="button"
-            onClick={() => applyRoute(route)}
-            className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:border-primary-300 hover:text-primary-600"
-          >
-            {route.label}
-          </button>
-        ))}
-      </div>
     </form>
   )
 }

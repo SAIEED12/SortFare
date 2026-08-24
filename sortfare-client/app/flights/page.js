@@ -10,7 +10,9 @@ export default async function FlightsPage({ searchParams }) {
   const origin = params?.origin ?? 'JFK'
   const destination = params?.destination ?? 'ORD'
   const date = params?.date
+  const returnDate = params?.returnDate
   const passengers = params?.passengers
+  const tripType = params?.tripType
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -22,11 +24,12 @@ export default async function FlightsPage({ searchParams }) {
           </span>
         ) : null}
         {date ? <span className="text-base font-normal text-gray-500 ml-2">{date}</span> : null}
+        {returnDate ? <span className="text-base font-normal text-gray-500 ml-2">→ {returnDate}</span> : null}
         {passengers ? <span className="text-base font-normal text-gray-500 ml-2">&middot; {passengers} {Number(passengers) === 1 ? 'passenger' : 'passengers'}</span> : null}
       </h1>
 
       <Suspense fallback={<FlightSkeleton />}>
-        <FlightsContent origin={origin} destination={destination} date={date} passengers={passengers} />
+        <FlightsContent origin={origin} destination={destination} date={date} returnDate={returnDate} passengers={passengers} />
       </Suspense>
     </div>
   )

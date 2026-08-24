@@ -2,26 +2,40 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { useSession, signOut } from '@/lib/auth-client'
 
-const links = [
+const publicLinks = [
   { href: '/', label: 'Home' },
   { href: '/flights', label: 'Flights' },
   { href: '/chat', label: 'Assistant' },
-  { href: '/saved', label: 'Saved' },
-  { href: '/login', label: 'Sign In' },
-  { href: '/signup', label: 'Sign Up' },
-  { href: '/account', label: 'Account' },
-  { href: '/health', label: 'Health' },
 ]
 
 export default function Nav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const { data: session } = useSession()
 
   const isActive = (href) => {
     if (href === '/') return pathname === '/'
     return pathname.startsWith(href)
   }
+
+  async function handleSignOut() {
+    await signOut()
+    setOpen(false)
+  }
+
+  const authLinks = session
+    ? [
+        ...publicLinks,
+        { href: '/saved', label: 'Saved' },
+        { href: '/account', label: 'Account' },
+      ]
+    : [
+        ...publicLinks,
+        { href: '/login', label: 'Sign In' },
+        { href: '/signup', label: 'Sign Up' },
+      ]
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -31,7 +45,7 @@ export default function Nav() {
         </Link>
 
         <nav className="hidden lg:flex lg:items-center lg:gap-6" aria-label="Main navigation">
-          {links.map((link) => (
+          {authLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -42,6 +56,15 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
+          {session && (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+            >
+              Sign Out
+            </button>
+          )}
         </nav>
 
         <button
@@ -64,7 +87,7 @@ export default function Nav() {
       {open && (
         <nav className="border-t lg:hidden" aria-label="Mobile navigation">
           <div className="space-y-1 px-4 pb-3 pt-2">
-            {links.map((link) => (
+            {authLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -76,6 +99,15 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
+            {session && (
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
         </nav>
       )}

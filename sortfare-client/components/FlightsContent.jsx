@@ -88,7 +88,7 @@ function SampleDataBanner() {
   )
 }
 
-export default function FlightsContent({ origin, destination, date, passengers }) {
+export default function FlightsContent({ origin, destination, date, returnDate, passengers }) {
   const [flights, setFlights] = useState(null)
   const [isSample, setIsSample] = useState(false)
   const [error, setError] = useState(null)
@@ -98,7 +98,7 @@ export default function FlightsContent({ origin, destination, date, passengers }
     setLoading(true)
     setError(null)
     try {
-      const result = await fetchFlights({ origin, destination, date, passengers })
+      const result = await fetchFlights({ origin, destination, date, returnDate, passengers })
       setFlights(result.flights)
       setIsSample(result.source === 'sample')
     } catch (err) {
@@ -106,7 +106,7 @@ export default function FlightsContent({ origin, destination, date, passengers }
     } finally {
       setLoading(false)
     }
-  }, [origin, destination, date, passengers])
+  }, [origin, destination, date, returnDate, passengers])
 
   useEffect(() => {
     let cancelled = false
@@ -114,7 +114,7 @@ export default function FlightsContent({ origin, destination, date, passengers }
       setLoading(true)
       setError(null)
       try {
-        const result = await fetchFlights({ origin, destination, date, passengers })
+        const result = await fetchFlights({ origin, destination, date, returnDate, passengers })
         if (!cancelled) {
           setFlights(result.flights)
           setIsSample(result.source === 'sample')
@@ -127,7 +127,7 @@ export default function FlightsContent({ origin, destination, date, passengers }
     }
     run()
     return () => { cancelled = true }
-  }, [origin, destination, date, passengers])
+  }, [origin, destination, date, returnDate, passengers])
 
   if (loading) {
     return <FlightSkeleton />

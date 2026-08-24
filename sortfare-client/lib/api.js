@@ -1,10 +1,8 @@
 import { flights } from '@/data/flights'
+import { searchOneWay, searchRoundTrip } from '@/lib/ignav'
 
 const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', GBP: '£' }
 
-// The server requires a YYYY-MM-DD departureDate, but the UI allows
-// leaving the date empty (e.g. the featured default search). Default to
-// about a week out so every request satisfies the API contract.
 const DEFAULT_DATE_OFFSET_DAYS = 7
 
 function defaultDepartureDate() {
@@ -13,21 +11,17 @@ function defaultDepartureDate() {
   return date.toISOString().slice(0, 10)
 }
 
-// Maps the UI search form fields onto the SortFare server's
-// /flights/search query contract (departureDate, adults).
-export function mapSearchParams({ origin, destination, date, passengers } = {}) {
+export function mapSearchParams({ origin, destination, date, passengers, returnDate } = {}) {
   const params = new URLSearchParams()
   if (origin) params.set('origin', origin)
   if (destination) params.set('destination', destination)
   if (date) params.set('departureDate', date)
   else if (origin || destination) params.set('departureDate', defaultDepartureDate())
+  if (returnDate) params.set('returnDate', returnDate)
   if (passengers) params.set('adults', passengers)
   return params
 }
 
-// Converts an ISO 8601 duration ("PT2H45M", "P1DT2H30M") into whole
-// minutes. Anything malformed or missing becomes 0 so cards never render
-// NaN from bad upstream data.
 export function isoDurationToMinutes(value) {
   if (typeof value !== 'string') return 0
   const match = value.match(/^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/)
@@ -38,9 +32,6 @@ export function isoDurationToMinutes(value) {
   )
 }
 
-// Shapes a raw Duffel offer (as normalized by the SortFare server) into
-// the flight shape the UI consumes (flat numeric price, minute-based
-// duration, "HH:mm" times, airport codes).
 export function normalizeFlight(raw = {}) {
   const amount = Number.parseFloat(raw.price?.amount)
   const currencyCode = raw.price?.currency || ''
@@ -73,6 +64,57 @@ export function normalizeFlight(raw = {}) {
   }
 }
 
+export function normalizeIgnavFlight(itinerary) {
+  const outbound = itinerary.outbound
+  const segments = outbound.segments || []
+  const firstSeg = segments[0] || {}
+  const lastSeg = segments[segments.length - 1] || {}
+
+  const depTime = firstSeg.departure_time_local?.slice(11, 16) || ''
+  const arrTime = lastSeg.arrival_time_local?.slice(11, 16) || ''
+
+  return {
+    id: itinerary.ignav_id,
+    airline: outbound.carrier || 'Unknown airline',
+    flightNumber: segments.map(s => s.flight_number).filter(Boolean).join(' → '),
+    duration: outbound.duration_minutes || 0,
+    stops: Math.max(0, segments.length - 1),
+    departure: {
+      time: depTime,
+      code: firstSeg.departure_airport || '',
+    },
+    arrival: {
+      time: arrTime,
+      code: lastSeg.arrival_airport || '',
+    },
+    price: itinerary.price?.amount || 0,
+    currency: itinerary.price?.currency || 'USD',
+    bookingUrl: null,
+    segments: segments.map(s => ({
+      flightNumber: s.flight_number,
+      airline: s.operating_carrier_name,
+      departureAirport: s.departure_airport,
+      departureTime: s.departure_time_local?.slice(11, 16),
+      arrivalAirport: s.arrival_airport,
+      arrivalTime: s.arrival_time_local?.slice(11, 16),
+      duration: s.duration_minutes,
+    })),
+    inbound: itinerary.inbound ? {
+      carrier: itinerary.inbound.carrier,
+      duration: itinerary.inbound.duration_minutes,
+      segments: (itinerary.inbound.segments || []).map(s => ({
+        flightNumber: s.flight_number,
+        airline: s.operating_carrier_name,
+        departureAirport: s.departure_airport,
+        departureTime: s.departure_time_local?.slice(11, 16),
+        arrivalAirport: s.arrival_airport,
+        arrivalTime: s.arrival_time_local?.slice(11, 16),
+        duration: s.duration_minutes,
+      })),
+    } : null,
+  }
+}
+
 function catalogForRoute(origin, destination) {
   return flights.filter(
     (f) =>
@@ -81,31 +123,63 @@ function catalogForRoute(origin, destination) {
   )
 }
 
-// Live search is unavailable (server down, HTTP error, bad payload):
-// fall back to the local sample catalog filtered by the requested route.
-// Callers can tell the two apart via `source`.
 export async function fetchFlights(searchParams = {}) {
-  const { origin, destination } = searchParams
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL
+  const { origin, destination, date, returnDate, passengers } = searchParams
+  const ignavKey = process.env.IGNAV_API_KEY
 
-  if (!baseUrl) {
-    return { flights: catalogForRoute(origin, destination), source: 'sample' }
+  if (ignavKey && origin && destination) {
+    try {
+      const departureDate = date || defaultDepartureDate()
+
+      if (returnDate) {
+        const result = await searchRoundTrip({
+          origin,
+          destination,
+          departureDate,
+          returnDate,
+          adults: passengers ? Number(passengers) : 1,
+        })
+        const flights = (result.itineraries || []).map(normalizeIgnavFlight)
+        return { flights, source: 'live' }
+      } else {
+        const result = await searchOneWay({
+          origin,
+          destination,
+          departureDate,
+          adults: passengers ? Number(passengers) : 1,
+        })
+        const flights = (result.itineraries || []).map(normalizeIgnavFlight)
+        return { flights, source: 'live' }
+      }
+    } catch (err) {
+      console.warn('Ignav API error, falling back to sample:', err.message)
+    }
   }
 
+  return { flights: catalogForRoute(origin, destination), source: 'sample' }
+}
+
+export async function fetchAirportSuggestions(query) {
+  if (!query || query.length < 2) return []
   try {
-    const res = await fetch(
-      `${baseUrl}/flights/search?${mapSearchParams(searchParams).toString()}`,
-      { headers: { Accept: 'application/json' } },
-    )
-    if (!res.ok) throw new Error(`Flight search failed (${res.status})`)
-    const contentType = res.headers.get('content-type') || ''
-    if (!contentType.includes('application/json')) {
-      throw new Error('Unexpected response type')
-    }
-    const body = await res.json()
-    const list = Array.isArray(body?.flights) ? body.flights : []
-    return { flights: list.map(normalizeFlight), source: 'live' }
+    const res = await fetch(`/api/airports?q=${encodeURIComponent(query)}&limit=6`)
+    if (!res.ok) return []
+    return res.json()
   } catch {
-    return { flights: catalogForRoute(origin, destination), source: 'sample' }
+    return []
+  }
+}
+
+export async function fetchBookingLinks(ignavId) {
+  try {
+    const res = await fetch('/api/booking-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ignav_id: ignavId }),
+    })
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
   }
 }

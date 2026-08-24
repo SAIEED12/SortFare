@@ -1,10 +1,7 @@
 'use client'
-// components/FlightRow.jsx
-//
-// Compact flight row shared by every tool result renderer (search results
-// list and single-flight details). Mirrors FlightCard's visual language but
-// sized for the chat column.
+import { useState } from 'react'
 import { Card } from '@heroui/react'
+import { fetchBookingLinks } from '@/lib/api'
 
 export function durationLabel(minutes) {
   const h = Math.floor(minutes / 60)
@@ -21,6 +18,22 @@ export function formatPrice(flight) {
 }
 
 export default function FlightRow({ flight }) {
+  const [loadingLinks, setLoadingLinks] = useState(false)
+
+  const handleGetDeal = async () => {
+    if (flight.bookingUrl) {
+      window.open(flight.bookingUrl, '_blank')
+      return
+    }
+
+    setLoadingLinks(true)
+    const data = await fetchBookingLinks(flight.id)
+    if (data?.booking_options?.[0]?.links?.[0]?.url) {
+      window.open(data.booking_options[0].links[0].url, '_blank')
+    }
+    setLoadingLinks(false)
+  }
+
   return (
     <Card shadow="none" className="w-full border border-neutral-100">
       <Card.Content className="p-3">
@@ -32,21 +45,24 @@ export default function FlightRow({ flight }) {
             <p className="text-xs text-neutral-500">
               {flight.departure.time} {flight.departure.code} → {flight.arrival.time} {flight.arrival.code}
             </p>
+            {flight.stops > 0 && flight.segments && flight.segments.length > 1 && (
+              <p className="text-[10px] text-gray-400 mt-0.5">
+                Layover: {flight.segments.slice(0, -1).map(s => s.arrivalAirport).join(', ')}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-neutral-500 sm:block">
               {durationLabel(flight.duration)} · {stopLabel(flight.stops)}
             </span>
             <span className="text-sm font-bold text-gray-900">{formatPrice(flight)}</span>
-            <a
-              href={flight.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md bg-primary-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-700"
+            <button
+              onClick={handleGetDeal}
+              disabled={loadingLinks}
+              className="rounded-md bg-primary-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              View deal
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+              {loadingLinks ? 'Loading...' : 'Get deal'}
+            </button>
           </div>
         </div>
       </Card.Content>

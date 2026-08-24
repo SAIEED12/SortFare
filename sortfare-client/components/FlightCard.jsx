@@ -1,12 +1,30 @@
 'use client'
+import { useState } from 'react'
 import { Card } from '@heroui/react'
+import { fetchBookingLinks } from '@/lib/api'
 
 export default function FlightCard({ flight }) {
+  const [loadingLinks, setLoadingLinks] = useState(false)
+
   const hours = Math.floor(flight.duration / 60)
   const minutes = flight.duration % 60
   const durationLabel = minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`
   const stopLabel =
     flight.stops === 0 ? 'Nonstop' : flight.stops === 1 ? '1 stop' : `${flight.stops} stops`
+
+  const handleGetDeal = async () => {
+    if (flight.bookingUrl) {
+      window.open(flight.bookingUrl, '_blank')
+      return
+    }
+
+    setLoadingLinks(true)
+    const data = await fetchBookingLinks(flight.id)
+    if (data?.booking_options?.[0]?.links?.[0]?.url) {
+      window.open(data.booking_options[0].links[0].url, '_blank')
+    }
+    setLoadingLinks(false)
+  }
 
   return (
     <Card className="w-full">
@@ -42,23 +60,28 @@ export default function FlightCard({ flight }) {
             <span className="text-xl font-bold">
               {flight.currency} {flight.price}
             </span>
-            {flight.bookingUrl ? (
-              <a
-                href={flight.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-              >
-                View Deal
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            ) : (
-              <span className="inline-flex items-center rounded-lg bg-neutral-100 px-4 py-1.5 text-sm font-medium text-gray-500">
-                Price only
-              </span>
-            )}
+            <button
+              onClick={handleGetDeal}
+              disabled={loadingLinks}
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loadingLinks ? 'Loading...' : 'Get Deal'}
+            </button>
           </div>
         </div>
+
+        {flight.stops > 0 && flight.segments && flight.segments.length > 1 && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <div className="flex flex-wrap gap-2 text-[11px] text-gray-500">
+              {flight.segments.slice(0, -1).map((seg, i) => (
+                <span key={i} className="inline-flex items-center gap-1">
+                  <span className="font-medium">{seg.arrivalAirport}</span>
+                  <span className="text-gray-400">layover</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </Card.Content>
     </Card>
   )
