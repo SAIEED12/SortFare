@@ -84,15 +84,15 @@ export default function SearchForm() {
       <input type="hidden" name="tripType" value={tripType} />
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Trip Type</label>
+        <label className="mb-2 block text-sm font-medium text-slate-700">Trip Type</label>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setTripType('oneway')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               tripType === 'oneway'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-accent-600 text-white'
+                : 'bg-paper text-slate-600 hover:bg-line'
             }`}
           >
             One-way
@@ -102,8 +102,8 @@ export default function SearchForm() {
             onClick={() => setTripType('roundtrip')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               tripType === 'roundtrip'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-accent-600 text-white'
+                : 'bg-paper text-slate-600 hover:bg-line'
             }`}
           >
             Round-trip
@@ -113,7 +113,7 @@ export default function SearchForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr]">
         <div ref={originRef} className="relative">
-          <label htmlFor="sf-origin" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="sf-origin" className="block text-sm font-medium text-slate-700">
             From
           </label>
           <Input
@@ -131,17 +131,17 @@ export default function SearchForm() {
             autoComplete="off"
           />
           {showOriginDropdown && originSuggestions.length > 0 && (
-            <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto">
+            <div className="absolute z-50 mt-1 w-full rounded-lg border border-line bg-surface shadow-lg max-h-60 overflow-auto">
               {originSuggestions.map((airport) => (
                 <button
                   key={airport.code}
                   type="button"
                   onClick={() => selectAirport(airport, setOriginQuery, setOrigin, setShowOriginDropdown)}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                  className="w-full px-4 py-3 text-left hover:bg-paper border-b border-line last:border-0"
                 >
                   <div className="font-medium text-sm">{airport.code}</div>
-                  <div className="text-xs text-gray-500">{airport.name}</div>
-                  <div className="text-xs text-gray-400">{airport.city}, {airport.country}</div>
+                  <div className="text-xs text-slate-500">{airport.name}</div>
+                  <div className="text-xs text-slate-400">{airport.city}, {airport.country}</div>
                 </button>
               ))}
             </div>
@@ -154,7 +154,7 @@ export default function SearchForm() {
             isIconOnly
             aria-label="Swap origin and destination"
             onClick={swap}
-            className="rounded-full border border-primary-200 bg-primary-50 text-primary-600"
+            className="rounded-full border border-accent-200 bg-accent-50 text-accent-600"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4" />
@@ -163,7 +163,7 @@ export default function SearchForm() {
         </div>
 
         <div ref={destRef} className="relative">
-          <label htmlFor="sf-destination" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="sf-destination" className="block text-sm font-medium text-slate-700">
             To
           </label>
           <Input
@@ -181,17 +181,17 @@ export default function SearchForm() {
             autoComplete="off"
           />
           {showDestDropdown && destinationSuggestions.length > 0 && (
-            <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto">
+            <div className="absolute z-50 mt-1 w-full rounded-lg border border-line bg-surface shadow-lg max-h-60 overflow-auto">
               {destinationSuggestions.map((airport) => (
                 <button
                   key={airport.code}
                   type="button"
                   onClick={() => selectAirport(airport, setDestinationQuery, setDestination, setShowDestDropdown)}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                  className="w-full px-4 py-3 text-left hover:bg-paper border-b border-line last:border-0"
                 >
                   <div className="font-medium text-sm">{airport.code}</div>
-                  <div className="text-xs text-gray-500">{airport.name}</div>
-                  <div className="text-xs text-gray-400">{airport.city}, {airport.country}</div>
+                  <div className="text-xs text-slate-500">{airport.name}</div>
+                  <div className="text-xs text-slate-400">{airport.city}, {airport.country}</div>
                 </button>
               ))}
             </div>
@@ -201,7 +201,7 @@ export default function SearchForm() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="sf-date" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="sf-date" className="block text-sm font-medium text-slate-700">
             {tripType === 'roundtrip' ? 'Departure Date' : 'Date'}
           </label>
           <Input
@@ -216,7 +216,7 @@ export default function SearchForm() {
 
         {tripType === 'roundtrip' && (
           <div>
-            <label htmlFor="sf-return-date" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="sf-return-date" className="block text-sm font-medium text-slate-700">
               Return Date
             </label>
             <Input
@@ -231,7 +231,7 @@ export default function SearchForm() {
         )}
 
         <div>
-          <label htmlFor="sf-passengers" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="sf-passengers" className="block text-sm font-medium text-slate-700">
             Passengers
           </label>
           <Select
@@ -260,7 +260,7 @@ export default function SearchForm() {
       <Button
         type="submit"
         fullWidth
-        className="mt-5 bg-primary-600 text-sm font-semibold text-white hover:bg-primary-700"
+        className="mt-5 bg-accent-600 text-sm font-semibold text-white hover:bg-accent-700"
       >
         Search Flights
       </Button>

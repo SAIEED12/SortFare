@@ -1,9 +1,21 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+/* ---------------------------------------------------------------------------
+   SortFare design tokens — "Boarding pass, modernized"
+   Structure: ink-navy. Action/accent: coral "Departure". Signal: green "best".
+--------------------------------------------------------------------------- */
+:root {
+  --sf-paper: #f4f6fb;
+  --sf-surface: #ffffff;
+  --sf-ink: #0e192b;
+  --sf-slate: #5a6b82;
+  --sf-line: #e4e9f2;
+}
+
 /* Global focus-visible styles for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--color-primary-500);
+  outline: 2px solid var(--color-accent-500);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -14,17 +26,52 @@
 }
 
 @theme {
-  --color-primary: #2563eb;
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  /* Primary = ink-navy (structure, links, icons) */
+  --color-primary: #243b61;
+  --color-primary-50: #eef2f8;
+  --color-primary-100: #d8e0ec;
+  --color-primary-200: #b3c2d9;
+  --color-primary-300: #849bbe;
+  --color-primary-400: #566fa0;
+  --color-primary-500: #34507f;
+  --color-primary-600: #243b61;
+  --color-primary-700: #1b2c4a;
+  --color-primary-800: #142137;
+  --color-primary-900: #0e192b;
+
+  /* Accent = blue (actions, fares, signal) — matches original theme */
+  --color-accent: #2563eb;
+  --color-accent-50: #eff6ff;
+  --color-accent-100: #dbeafe;
+  --color-accent-200: #bfdbfe;
+  --color-accent-300: #93c5fd;
+  --color-accent-400: #60a5fa;
+  --color-accent-500: #3b82f6;
+  --color-accent-600: #2563eb;
+  --color-accent-700: #1d4ed8;
+  --color-accent-800: #1e40af;
+  --color-accent-900: #1e3a8a;
+
+  /* Best-fare signal = green */
+  --color-best: #0b7e4f;
+  --color-best-50: #e7f8f0;
+  --color-best-100: #c7efdc;
+  --color-best-200: #95e3bf;
+  --color-best-300: #5fd09c;
+  --color-best-400: #2fb87c;
+  --color-best-500: #149c63;
+  --color-best-600: #0b7e4f;
+  --color-best-700: #0b6240;
+  --color-best-800: #0e4d34;
+  --color-best-900: #0c3d2a;
+
+  /* Surfaces / neutrals */
+  --color-paper: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-line: #e4e9f2;
+  --color-ink: #0e192b;
+  --color-slate: #5a6b82;
+
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #e5e5e5;
@@ -35,8 +82,93 @@
   --color-neutral-700: #404040;
   --color-neutral-800: #262626;
   --color-neutral-900: #171717;
+
   --font-family-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: var(--font-space-grotesk), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-family-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+body {
+  background-color: var(--sf-paper);
+  color: var(--sf-ink);
+  font-family: var(--font-family-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-family-display);
+  letter-spacing: -0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   Reusable surface helpers
+--------------------------------------------------------------------------- */
+.sf-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(14, 25, 43, 0.04), 0 10px 30px -12px rgba(14, 25, 43, 0.12);
+}
+
+.sf-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent-600);
+}
+
+.sf-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-best-700);
+  background: var(--color-best-50);
+  border: 1px solid var(--color-best-200);
+  border-radius: 9999px;
+  padding: 0.15rem 0.55rem;
+}
+
+/* Boarding-pass perforation divider */
+.sf-perf {
+  position: relative;
+  align-self: stretch;
+  border-left: 2px dashed var(--color-line);
+  margin: 0 -1px;
+}
+.sf-perf::before,
+.sf-perf::after {
+  content: "";
+  position: absolute;
+  left: -9px;
+  width: 16px;
+  height: 16px;
+  background: var(--sf-paper);
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}
+.sf-perf::before { top: -8px; }
+.sf-perf::after { bottom: -8px; }
+
+/* Boarding-pass barcode detail */
+.sf-barcode {
+  height: 22px;
+  width: 100%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--sf-ink) 0 1px,
+    transparent 1px 3px,
+    var(--sf-ink) 3px 4px,
+    transparent 4px 8px
+  );
+  opacity: 0.5;
 }
 
 /* --- Chat motion (components/Chat.jsx) --- */

@@ -35,16 +35,16 @@ function reducer(state, action) {
 
 const COLORS = {
   primary: {
-    idle: 'bg-primary-600 text-white',
-    loading: 'bg-primary-600 text-white',
-    success: 'bg-emerald-600 text-white',
+    idle: 'bg-accent-600 text-white',
+    loading: 'bg-accent-600 text-white',
+    success: 'bg-best-600 text-white',
     error: 'bg-red-600 text-white',
-    disabled: 'bg-primary-400/50 text-white/70 cursor-not-allowed',
+    disabled: 'bg-accent-400/50 text-white/70 cursor-not-allowed',
   },
   danger: {
     idle: 'bg-red-600 text-white',
     loading: 'bg-red-600 text-white',
-    success: 'bg-emerald-600 text-white',
+    success: 'bg-best-600 text-white',
     error: 'bg-red-700 text-white ring-2 ring-red-300',
     disabled: 'bg-red-400/50 text-white/70 cursor-not-allowed',
   },
@@ -301,7 +301,7 @@ export default function StatefulButton({
         aria-disabled={isDisabled || undefined}
         className={[
           'relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-6 py-3 text-sm font-semibold shadow-sm outline-none',
-          'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+          'focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2',
           'disabled:pointer-events-none disabled:opacity-50',
           bgColor,
           className,

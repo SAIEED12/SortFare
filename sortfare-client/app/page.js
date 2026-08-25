@@ -90,10 +90,8 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
-            How it works
-          </p>
-          <h2 id="how-it-works" className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <p className="sf-eyebrow">How it works</p>
+          <h2 id="how-it-works" className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             From search to takeoff in three steps
           </h2>
         </div>
@@ -102,41 +100,39 @@ export default function Home() {
           {steps.map((step) => (
             <li
               key={step.number}
-              className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm"
+              className="sf-card p-6 text-center"
             >
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
                 {step.icon}
               </div>
-              <span className="mt-4 block text-xs font-semibold text-primary-600">
+              <span className="mt-4 block text-xs font-semibold text-accent-600">
                 Step {step.number}
               </span>
-              <h3 className="mt-1 text-lg font-semibold text-gray-900">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">{step.description}</p>
+              <h3 className="mt-1 text-lg font-semibold text-ink">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-500">{step.description}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="bg-gray-50 py-20" aria-labelledby="features" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
+      <section className="bg-surface py-20" aria-labelledby="features" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="mx-auto max-w-7xl px-4">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
-              Features
-            </p>
-            <h2 id="features" className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <p className="sf-eyebrow">Features</p>
+            <h2 id="features" className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
               Everything you need to pick the right flight
             </h2>
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
-              <Card key={feature.title} className="w-full">
+              <Card key={feature.title} className="w-full border border-line bg-surface">
                 <Card.Content className="p-6">
                   <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
                     {feature.icon}
                   </div>
-                  <h3 className="mt-4 text-base font-semibold text-gray-900">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-500">{feature.description}</p>
+                  <h3 className="mt-4 text-base font-semibold text-ink">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{feature.description}</p>
                 </Card.Content>
               </Card>
             ))}
@@ -147,16 +143,14 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
-              Popular deals
-            </p>
-            <h2 id="popular-deals" className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <p className="sf-eyebrow">Popular deals</p>
+            <h2 id="popular-deals" className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
               Trending fares right now
             </h2>
           </div>
           <Link
             href="/flights"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-accent-600 hover:text-accent-700"
           >
             Browse all flights
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -166,24 +160,24 @@ export default function Home() {
         </div>
 
         <div className="mt-10 space-y-4">
-          {popularFlights.map((flight) => (
-            <FlightCard key={flight.id} flight={flight} />
+          {popularFlights.map((flight, i) => (
+            <FlightCard key={flight.id} flight={flight} isBest={i === 0} />
           ))}
         </div>
       </section>
 
       <section className="px-4 pb-20" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-16 text-center sm:px-16">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-accent-500 to-primary-800 px-6 py-16 text-center shadow-sm sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Your next flight is one search away
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm text-primary-100 sm:text-base">
+          <p className="mx-auto mt-4 max-w-xl text-sm text-accent-100 sm:text-base">
             Create a free account to save flights and keep your shortlist handy for when you are ready to book.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/signup"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-50 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-accent-700 transition-colors hover:bg-accent-50 sm:w-auto"
             >
               Create free account
             </Link>

@@ -35,33 +35,33 @@ export default function FlightRow({ flight }) {
   }
 
   return (
-    <Card shadow="none" className="w-full border border-neutral-100">
+    <Card shadow="none" className="w-full border border-line">
       <Card.Content className="p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-gray-900">
-              {flight.airline} <span className="font-normal text-neutral-500">{flight.flightNumber}</span>
+            <p className="truncate text-sm font-semibold text-ink">
+              {flight.airline} <span className="font-normal text-slate-500">{flight.flightNumber}</span>
             </p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-slate-500">
               {flight.departure.time} {flight.departure.code} → {flight.arrival.time} {flight.arrival.code}
             </p>
             {flight.stops > 0 && flight.segments && flight.segments.length > 1 && (
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[10px] text-slate-400 mt-0.5">
                 Layover: {flight.segments.slice(0, -1).map(s => s.arrivalAirport).join(', ')}
               </p>
             )}
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-neutral-500 sm:block">
+            <span className="hidden text-xs text-slate-500 sm:block">
               {durationLabel(flight.duration)} · {stopLabel(flight.stops)}
             </span>
-            <span className="text-sm font-bold text-gray-900">{formatPrice(flight)}</span>
+            <span className="font-mono text-sm font-bold text-ink">{formatPrice(flight)}</span>
             <button
               onClick={handleGetDeal}
               disabled={loadingLinks}
-              className="rounded-md bg-primary-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-md bg-accent-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-accent-700 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loadingLinks ? 'Loading...' : 'Get deal'}
+              {loadingLinks ? 'Loading…' : 'Get deal'}
             </button>
           </div>
         </div>

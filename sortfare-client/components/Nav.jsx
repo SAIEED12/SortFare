@@ -38,19 +38,24 @@ export default function Nav() {
       ]
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-lg font-bold tracking-tight">
+    <header className="sticky top-0 z-50 px-3 pt-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-line bg-surface/85 px-4 py-2.5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface/70">
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-ink">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-600 text-white">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 00-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z" />
+            </svg>
+          </span>
           SortFare
         </Link>
 
-        <nav className="hidden lg:flex lg:items-center lg:gap-6" aria-label="Main navigation">
+        <nav className="hidden lg:flex lg:items-center lg:gap-7" aria-label="Main navigation">
           {authLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                isActive(link.href) ? 'text-blue-600' : 'text-gray-600'
+              className={`text-sm font-medium transition-colors hover:text-accent-600 ${
+                isActive(link.href) ? 'text-accent-600' : 'text-slate-600'
               }`}
             >
               {link.label}
@@ -60,7 +65,7 @@ export default function Nav() {
             <button
               type="button"
               onClick={handleSignOut}
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-accent-600"
             >
               Sign Out
             </button>
@@ -69,7 +74,7 @@ export default function Nav() {
 
         <button
           type="button"
-          className="lg:hidden rounded-md p-2 text-gray-600 hover:bg-gray-100"
+          className="rounded-md p-2 text-slate-600 transition-colors hover:bg-paper"
           onClick={() => setOpen(!open)}
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
@@ -85,15 +90,15 @@ export default function Nav() {
       </div>
 
       {open && (
-        <nav className="border-t lg:hidden" aria-label="Mobile navigation">
-          <div className="space-y-1 px-4 pb-3 pt-2">
+        <nav className="mx-auto mt-2 max-w-6xl lg:hidden" aria-label="Mobile navigation">
+          <div className="space-y-1 rounded-2xl border border-line bg-surface px-4 pb-3 pt-2 shadow-sm">
             {authLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 ${
-                  isActive(link.href) ? 'text-blue-600' : 'text-gray-600'
+                className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-paper ${
+                  isActive(link.href) ? 'text-accent-600' : 'text-slate-600'
                 }`}
               >
                 {link.label}
@@ -103,7 +108,7 @@ export default function Nav() {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-paper"
               >
                 Sign Out
               </button>
