@@ -13,14 +13,18 @@ if (!uri) {
 if (process.env.NODE_ENV === 'development') {
   const globalWithMongo = globalThis
 
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options)
-    globalWithMongo._mongoClientPromise = client.connect()
+  if (!globalWithMongo._mongoClient) {
+    globalWithMongo._mongoClient = new MongoClient(uri, options)
+    globalWithMongo._mongoClientPromise = globalWithMongo._mongoClient.connect()
   }
+  client = globalWithMongo._mongoClient
   clientPromise = globalWithMongo._mongoClientPromise
 } else {
   client = new MongoClient(uri, options)
   clientPromise = client.connect()
 }
 
-export default clientPromise
+const db = client.db()
+
+export default db
+export { client, clientPromise }

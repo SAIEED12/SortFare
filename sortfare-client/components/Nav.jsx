@@ -74,7 +74,7 @@ export default function Nav() {
 
         <button
           type="button"
-          className="rounded-md p-2 text-slate-600 transition-colors hover:bg-paper"
+          className="rounded-md p-2 text-slate-600 transition-colors hover:bg-paper lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
