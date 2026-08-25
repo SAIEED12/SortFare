@@ -1,11 +1,8 @@
-import { flights } from '@/data/flights'
-import { searchOneWay, searchRoundTrip } from '@/lib/ignav'
-
 const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', GBP: '£' }
 
 const DEFAULT_DATE_OFFSET_DAYS = 7
 
-function defaultDepartureDate() {
+export function defaultDepartureDate() {
   const date = new Date()
   date.setDate(date.getDate() + DEFAULT_DATE_OFFSET_DAYS)
   return date.toISOString().slice(0, 10)
@@ -65,7 +62,7 @@ export function normalizeFlight(raw = {}) {
 }
 
 export function normalizeIgnavFlight(itinerary) {
-  const outbound = itinerary.outbound
+  const outbound = itinerary?.outbound || {}
   const segments = outbound.segments || []
   const firstSeg = segments[0] || {}
   const lastSeg = segments[segments.length - 1] || {}
@@ -99,7 +96,7 @@ export function normalizeIgnavFlight(itinerary) {
       arrivalTime: s.arrival_time_local?.slice(11, 16),
       duration: s.duration_minutes,
     })),
-    inbound: itinerary.inbound ? {
+    inbound: itinerary?.inbound ? {
       carrier: itinerary.inbound.carrier,
       duration: itinerary.inbound.duration_minutes,
       segments: (itinerary.inbound.segments || []).map(s => ({
@@ -115,48 +112,26 @@ export function normalizeIgnavFlight(itinerary) {
   }
 }
 
-function catalogForRoute(origin, destination) {
-  return flights.filter(
-    (f) =>
-      (!origin || f.departure.code === origin) &&
-      (!destination || f.arrival.code === destination),
-  )
-}
-
 export async function fetchFlights(searchParams = {}) {
   const { origin, destination, date, returnDate, passengers } = searchParams
-  const ignavKey = process.env.IGNAV_API_KEY
 
-  if (ignavKey && origin && destination) {
-    try {
-      const departureDate = date || defaultDepartureDate()
+  const params = new URLSearchParams()
+  if (origin) params.set('origin', origin)
+  if (destination) params.set('destination', destination)
+  if (date) params.set('departureDate', date)
+  if (returnDate) params.set('returnDate', returnDate)
+  if (passengers) params.set('adults', passengers)
 
-      if (returnDate) {
-        const result = await searchRoundTrip({
-          origin,
-          destination,
-          departureDate,
-          returnDate,
-          adults: passengers ? Number(passengers) : 1,
-        })
-        const flights = (result.itineraries || []).map(normalizeIgnavFlight)
-        return { flights, source: 'live' }
-      } else {
-        const result = await searchOneWay({
-          origin,
-          destination,
-          departureDate,
-          adults: passengers ? Number(passengers) : 1,
-        })
-        const flights = (result.itineraries || []).map(normalizeIgnavFlight)
-        return { flights, source: 'live' }
-      }
-    } catch (err) {
-      console.warn('Ignav API error, falling back to sample:', err.message)
-    }
+  const res = await fetch(`/api/flights?${params.toString()}`)
+  if (!res.ok) {
+    throw new Error(`Flight search failed (${res.status})`)
   }
 
-  return { flights: catalogForRoute(origin, destination), source: 'sample' }
+  const data = await res.json()
+  return {
+    flights: Array.isArray(data.flights) ? data.flights : [],
+    source: data.source === 'live' ? 'live' : 'sample',
+  }
 }
 
 export async function fetchAirportSuggestions(query) {

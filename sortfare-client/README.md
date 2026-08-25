@@ -50,7 +50,7 @@ The AI chat assistant (`/chat`) runs server-side tool calls via `/api/chat` rout
 | Route | Description |
 |-------|-------------|
 | `/` | Landing page with 3D globe hero, features, popular deals |
-| `/flights` | Flight search and comparison page |
+| `/flights` | Flight search and comparison page; with no search params it shows featured deals across several routes |
 | `/chat` | AI assistant for flight questions and travel tips |
 | `/health` | API connectivity health check |
 | `/login`, `/signup` | Authentication pages |
@@ -123,7 +123,7 @@ sortfare-client/
 │   ├── FlightCard.jsx      # Flight result card
 │   └── Nav.jsx, Footer.jsx
 ├── data/                   # Flight routes and catalog
-│   ├── flights.js          # 8 demo flights (JFK → ORD)
+│   ├── flights.js          # 20 demo flights across 4 routes (JFK→ORD, LAX→SFO, SEA→JFK, MIA→LAX)
 │   └── routes.js           # Airport coordinates and airline colors
 ├── hooks/                  # Custom React hooks
 │   └── usePrefersReducedMotion.js
