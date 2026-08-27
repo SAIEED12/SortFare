@@ -15,6 +15,9 @@ export default function Nav() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
 
+  const name = session?.user?.name?.trim()
+  const greeting = name ? `Hi, ${name}` : 'Hi, there'
+
   const isActive = (href) => {
     if (href === '/') return pathname === '/'
     return pathname.startsWith(href)
@@ -62,6 +65,11 @@ export default function Nav() {
             </Link>
           ))}
           {session && (
+            <span className="text-sm font-medium text-ink" aria-label={greeting}>
+              {greeting}
+            </span>
+          )}
+          {session && (
             <button
               type="button"
               onClick={handleSignOut}
@@ -104,6 +112,14 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
+            {session && (
+              <span
+                className="block rounded-md px-3 py-2 text-sm font-medium text-ink"
+                aria-label={greeting}
+              >
+                {greeting}
+              </span>
+            )}
             {session && (
               <button
                 type="button"
