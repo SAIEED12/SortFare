@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { fetchBookingLinks } from '@/lib/api'
+import SaveButton from '@/components/SaveButton'
 
 export default function FlightCard({ flight, isBest = false }) {
   const [loadingLinks, setLoadingLinks] = useState(false)
@@ -95,13 +96,16 @@ export default function FlightCard({ flight, isBest = false }) {
               {flight.currency} {flight.price}
             </div>
           </div>
-          <button
-            onClick={handleGetDeal}
-            disabled={loadingLinks}
-            className="inline-flex items-center justify-center rounded-xl bg-accent-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-700 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loadingLinks ? 'Loading…' : 'Get deal'}
-          </button>
+          <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
+            <SaveButton flight={flight} />
+            <button
+              onClick={handleGetDeal}
+              disabled={loadingLinks}
+              className="inline-flex items-center justify-center rounded-xl bg-accent-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-700 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loadingLinks ? 'Loading…' : 'Get deal'}
+            </button>
+          </div>
         </div>
       </div>
 

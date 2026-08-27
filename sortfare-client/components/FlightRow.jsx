@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Card } from '@heroui/react'
 import { fetchBookingLinks } from '@/lib/api'
+import SaveButton from '@/components/SaveButton'
 
 export function durationLabel(minutes) {
   const h = Math.floor(minutes / 60)
@@ -56,6 +57,7 @@ export default function FlightRow({ flight }) {
               {durationLabel(flight.duration)} · {stopLabel(flight.stops)}
             </span>
             <span className="font-mono text-sm font-bold text-ink">{formatPrice(flight)}</span>
+            <SaveButton flight={flight} />
             <button
               onClick={handleGetDeal}
               disabled={loadingLinks}

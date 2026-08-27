@@ -45,6 +45,8 @@ Client fetch → NEXT_PUBLIC_API_URL
 
 The AI chat assistant (`/chat`) runs server-side tool calls via `/api/chat` route handlers. It uses a local flight catalog (`data/flights.js`) for demo data and can fetch external URLs via the `fetchUrl` tool.
 
+Saved flights are persisted in MongoDB by the separate SortFare server (the `savedFlights` collection in the Express backend, keyed by the Better Auth `userId`). The client sends the authenticated `userId` with each request; the `/saved` page and the "Save" button on every flight card read and write that collection via `NEXT_PUBLIC_API_URL`.
+
 ### Key Pages
 
 | Route | Description |
@@ -52,6 +54,7 @@ The AI chat assistant (`/chat`) runs server-side tool calls via `/api/chat` rout
 | `/` | Landing page with 3D globe hero, features, popular deals |
 | `/flights` | Flight search and comparison page; with no search params it shows featured deals across several routes |
 | `/chat` | AI assistant for flight questions and travel tips |
+| `/saved` | Saved flight shortlist (requires account); tap "Save" on any flight to add it |
 | `/health` | API connectivity health check |
 | `/login`, `/signup` | Authentication pages |
 
