@@ -1,55 +1,55 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { signUp } from '@/lib/auth-client'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 export default function SignupPage() {
-  const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(e) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+  e.preventDefault()
+  setError('')
+  setLoading(true)
 
-    const { error: authError } = await signUp.email({
-      name,
-      email,
-      password,
-      callbackURL: '/',
-    })
+  const { error: authError } = await authClient.signUp.email({
+    name,
+    email,
+    password,
+    callbackURL: '/',
+  })
 
-    setLoading(false)
+  setLoading(false)
 
-    if (authError) {
-      setError(authError.message || 'Failed to create account')
-      return
-    }
-
-    router.push('/')
+  if (authError) {
+    setError(authError.message || 'Failed to create account')
+    return
   }
 
-  async function handleGoogleSignUp() {
-    setGoogleLoading(true)
-    setError('')
+  router.push('/')
+}
 
-    const { error: authError } = await signUp.social({
-      provider: 'google',
-      callbackURL: '/',
-    })
+const handleGoogleSignUp = async () => {
+  setGoogleLoading(true)
+  setError('')
 
-    if (authError) {
-      setGoogleLoading(false)
-      setError(authError.message || 'Google sign-up failed')
-    }
+  const { error: authError } = await authClient.signIn.social({
+    provider: 'google',
+    callbackURL: '/',
+  })
+
+  if (authError) {
+    setGoogleLoading(false)
+    setError(authError.message || 'Google sign-up failed')
   }
+}
 
   return (
     <div className="mx-auto max-w-md px-4 py-12">
@@ -59,14 +59,21 @@ export default function SignupPage() {
       </p>
 
       {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert" aria-live="polite">
+        <div
+          className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          role="alert"
+          aria-live="polite"
+        >
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <input
@@ -82,7 +89,10 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input
@@ -98,7 +108,10 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
             Password
           </label>
           <input
@@ -119,7 +132,7 @@ export default function SignupPage() {
           disabled={loading}
           className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? 'Creating account...' : 'Create Account'}
+          {loading ? "Creating account..." : "Create Account"}
         </button>
       </form>
 
@@ -138,15 +151,18 @@ export default function SignupPage() {
         disabled={googleLoading}
         className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {googleLoading ? 'Redirecting...' : 'Sign up with Google'}
+        {googleLoading ? "Redirecting..." : "Sign up with Google"}
       </button>
 
       <p className="mt-6 text-center text-sm text-gray-500">
-        Already have an account?{' '}
-        <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-semibold text-blue-600 hover:text-blue-700"
+        >
           Sign in
         </Link>
       </p>
     </div>
-  )
+  );
 }
