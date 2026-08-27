@@ -24,7 +24,8 @@ if (process.env.NODE_ENV === 'development') {
   clientPromise = client.connect()
 }
 
-const db = client.db()
+const dbName = process.env.MONGODB_DB || 'sortfare'
+const db = client.db(dbName)
 
 export default db
 export { client, clientPromise }

@@ -1,33 +1,16 @@
-import { betterAuth } from 'better-auth'
-import { mongodbAdapter } from 'better-auth/adapters/mongodb'
-import { nextCookies } from 'better-auth/next-js'
-import db, { client } from './mongodb'
+import { betterAuth } from "better-auth";
+import { MongoClient } from "mongodb";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+
+const client = new MongoClient("mongodb://localhost:27017/database");
+const db = client.db();
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    client,
+    // Optional: if you don't provide a client, database transactions won't be enabled.
+    client
   }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-    ? {
-        socialProviders: {
-          google: {
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          },
-        },
-      }
-    : {}),
-  plugins: [nextCookies()],
-  advanced: {
-    database: {
-      joins: true,
-    },
-  },
-  trustedOrigins: [
-    'http://localhost:3000',
-    process.env.NEXT_PUBLIC_APP_URL,
-  ].filter(Boolean),
-})
+    emailAndPassword: { 
+    enabled: true, 
+  }, 
+});
