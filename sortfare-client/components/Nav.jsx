@@ -31,7 +31,6 @@ export default function Nav() {
   const authLinks = session
     ? [
         ...publicLinks,
-        { href: '/saved', label: 'Saved' },
         { href: '/account', label: 'Account' },
       ]
     : [

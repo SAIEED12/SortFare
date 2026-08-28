@@ -1,7 +1,7 @@
 import { getSessionCookie } from 'better-auth/cookies'
 import { NextRequest, NextResponse } from 'next/server'
 
-const protectedRoutes = ['/saved', '/account']
+const protectedRoutes = ['/account']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -21,5 +21,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/saved/:path*', '/account/:path*'],
+  matcher: ['/account/:path*'],
 }

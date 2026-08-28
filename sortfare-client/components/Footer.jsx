@@ -3,7 +3,6 @@ import Link from 'next/link'
 const productLinks = [
   { href: '/', label: 'Home' },
   { href: '/flights', label: 'Search Flights' },
-  { href: '/saved', label: 'Saved Flights' },
 ]
 
 const accountLinks = [

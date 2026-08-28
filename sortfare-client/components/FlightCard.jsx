@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { fetchBookingLinks } from '@/lib/api'
-import SaveButton from '@/components/SaveButton'
 
 export default function FlightCard({ flight, isBest = false }) {
   const [loadingLinks, setLoadingLinks] = useState(false)
@@ -97,7 +96,6 @@ export default function FlightCard({ flight, isBest = false }) {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
-            <SaveButton flight={flight} />
             <button
               onClick={handleGetDeal}
               disabled={loadingLinks}
