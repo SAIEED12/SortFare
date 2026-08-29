@@ -302,24 +302,107 @@ body.chat-active {
   width: 100%;
 }
 
+/* --- StatefulButton motion (components/StatefulButton.jsx) --- */
+
+/* Spinner CSS fallback for SSR / non-JS */
+@keyframes sf-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sf-btn-spin {
+  animation: sf-btn-spin 0.8s linear infinite;
+}
+
+/* --- Compare checkbox (components/FlightCard.jsx) --- */
+
+.sf-compare-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--color-line);
+  background: var(--color-surface);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.sf-compare-check::after {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.sf-compare-checkbox:checked + .sf-compare-check {
+  border-color: var(--color-accent-600);
+  background: var(--color-accent-600);
+}
+
+.sf-compare-checkbox:checked + .sf-compare-check::after {
+  background: white;
+  /* checkmark via clip-path */
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  width: 12px;
+  height: 12px;
+  margin: -1px;
+}
+
+.sf-compare-checkbox:disabled + .sf-compare-check {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sf-compare-checkbox:focus-visible + .sf-compare-check {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+/* --- Compare bar slide-up (components/CompareBar.jsx) --- */
+
+@keyframes sf-bar-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sf-bar-slide-up {
+  animation: sf-bar-slide-up 0.25s ease-out both;
+}
+
+/* --- Compare modal entrance (components/CompareModal.jsx) --- */
+
+@keyframes sf-compare-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-compare-modal-in {
+  animation: sf-compare-modal-in 0.2s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-message-in {
+  .sf-bar-slide-up {
     animation: none;
   }
-  .animate-caret {
-    animation: none;
-  }
-  .sf-dots-leave,
-  .sf-text-enter {
-    animation: none;
-  }
-  .sf-tool-phase-in {
-    animation: none;
-  }
-  .sf-error-in {
-    animation: none;
-  }
-  .sf-btn-spin {
+  .animate-compare-modal-in {
     animation: none;
   }
 }

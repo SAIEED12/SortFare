@@ -1,9 +1,14 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { fetchBookingLinks } from '@/lib/api'
+import { useCompare } from '@/context/CompareContext'
 
-export default function FlightCard({ flight, isBest = false }) {
+export default function FlightCard({ flight, isBest = false, showCompare = true }) {
   const [loadingLinks, setLoadingLinks] = useState(false)
+  const { toggleFlight, isSelected, isFull } = useCompare()
+  const selected = isSelected(flight.id)
+  const disabled = isFull && !selected
 
   const hours = Math.floor(flight.duration / 60)
   const minutes = flight.duration % 60
@@ -26,12 +31,24 @@ export default function FlightCard({ flight, isBest = false }) {
   }
 
   return (
-    <div className="sf-card overflow-hidden">
+    <div className={`sf-card overflow-hidden transition-shadow ${selected ? 'ring-2 ring-accent-500' : ''}`}>
       <div className="flex flex-col sm:flex-row">
         {/* Main ticket body */}
         <div className="flex-1 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
+              {showCompare && (
+                <label className="relative flex items-center" aria-label={`Compare ${flight.airline} ${flight.flightNumber}`}>
+                  <input
+                    type="checkbox"
+                    className="sf-compare-checkbox peer sr-only"
+                    checked={selected}
+                    disabled={disabled}
+                    onChange={() => toggleFlight(flight)}
+                  />
+                  <span className="sf-compare-check" />
+                </label>
+              )}
               <span className="text-sm font-semibold text-ink">{flight.airline}</span>
               <span className="text-xs text-slate-500">{flight.flightNumber}</span>
             </div>
@@ -96,6 +113,12 @@ export default function FlightCard({ flight, isBest = false }) {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
+            <Link
+              href={`/flights/${flight.id}`}
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-line px-4 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-paper hover:text-accent-600"
+            >
+              Details
+            </Link>
             <button
               onClick={handleGetDeal}
               disabled={loadingLinks}

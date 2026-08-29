@@ -5,6 +5,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { CompareProvider } from "@/context/CompareContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,9 +42,11 @@ export default function RootLayout({ children }) {
         >
           Skip to main content
         </a>
-        <Nav />
-        <main id="main-content" className="flex-1">{children}</main>
-        <Footer />
+        <CompareProvider>
+          <Nav />
+          <main id="main-content" className="flex-1">{children}</main>
+          <Footer />
+        </CompareProvider>
       </body>
     </html>
   );
