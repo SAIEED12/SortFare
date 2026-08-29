@@ -1,7 +1,7 @@
 export default function ChatLoading() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-10">
-      <div className="flex h-[70dvh] min-h-[28rem] flex-col items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm sm:rounded-3xl">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-4 sm:py-6">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100">
             <svg className="h-5 w-5 animate-pulse text-neutral-400" fill="currentColor" viewBox="0 0 24 24">

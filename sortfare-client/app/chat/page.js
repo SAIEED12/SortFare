@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-10">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-4 sm:py-6">
       <Chat />
     </div>
   )

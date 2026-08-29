@@ -252,15 +252,6 @@ function UserMessage({ message }) {
     </div>
   )
 }
-
-// ---------------------------------------------------------------------------
-// Auto-scroll: pinned to the bottom only while the user is already there.
-// Scrolling up mid-stream releases the pin; the floating "jump to latest"
-// button brings it back and re-pins for subsequent tokens.
-// ---------------------------------------------------------------------------
-
-const SCROLL_TOLERANCE_PX = 24
-
 const SUGGESTIONS = [
   'What is the cheapest flight from JFK to Chicago today?',
   'Compare the fastest and cheapest options for JFK → ORD.',
@@ -278,7 +269,6 @@ export default function Chat() {
 
   const scrollRef = useRef(null)
   const textareaRef = useRef(null)
-  const [atBottom, setAtBottom] = useState(true)
 
   // --- persistence ------------------------------------------------
   useEffect(() => {
@@ -290,26 +280,6 @@ export default function Chat() {
   useEffect(() => {
     if (messages.length > 0) storeMessages(messages)
   }, [messages])
-
-  // --- auto-scroll ------------------------------------------------
-  const checkAtBottom = useCallback(() => {
-    const el = scrollRef.current
-    if (!el) return
-    setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_TOLERANCE_PX)
-  }, [])
-
-  useEffect(() => {
-    if (atBottom && scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [messages, atBottom])
-
-  const jumpToLatest = () => {
-    const el = scrollRef.current
-    if (!el) return
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    setAtBottom(true)
-  }
 
   // --- Mobile Safari keyboard handling ----------------------------------
   const textareaFocus = useCallback(() => {
@@ -366,7 +336,7 @@ export default function Chat() {
     lastMessage?.role === 'assistant' && status === 'ready' && !error
 
   return (
-    <div className="flex h-[70dvh] min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm sm:rounded-3xl">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
         <div className="flex items-center gap-3">
@@ -477,7 +447,6 @@ export default function Chat() {
       {/* Messages */}
       <div
         ref={scrollRef}
-        onScroll={checkAtBottom}
         className="chat-messages-container relative flex-1 overflow-y-auto overscroll-contain bg-neutral-50"
         role="log"
         aria-live="polite"
@@ -537,19 +506,6 @@ export default function Chat() {
           })}
         </div>
 
-        {!atBottom && (
-          <button
-            type="button"
-            onClick={jumpToLatest}
-            aria-label="Jump to latest message"
-            className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-lg transition-colors hover:border-primary-300 hover:text-primary-700"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l-4.5-4.5M12 19.5l4.5-4.5" />
-            </svg>
-            Jump to latest
-          </button>
-        )}
       </div>
 
       {/* Composer */}
