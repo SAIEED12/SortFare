@@ -10,6 +10,17 @@ export const flights = [
     price: 189,
     currency: '$',
     bookingUrl: 'https://www.delta.com',
+    segments: [
+      {
+        flightNumber: 'DL 482',
+        airline: 'Delta Air Lines',
+        departureAirport: 'JFK',
+        departureTime: '06:30',
+        arrivalAirport: 'ORD',
+        arrivalTime: '09:15',
+        duration: 165,
+      },
+    ],
   },
   {
     id: 2,
@@ -22,6 +33,26 @@ export const flights = [
     price: 145,
     currency: '$',
     bookingUrl: 'https://www.united.com',
+    segments: [
+      {
+        flightNumber: 'UA 723',
+        airline: 'United Airlines',
+        departureAirport: 'JFK',
+        departureTime: '08:00',
+        arrivalAirport: 'CLE',
+        arrivalTime: '09:45',
+        duration: 105,
+      },
+      {
+        flightNumber: 'UA 1182',
+        airline: 'United Airlines',
+        departureAirport: 'CLE',
+        departureTime: '10:30',
+        arrivalAirport: 'ORD',
+        arrivalTime: '11:30',
+        duration: 60,
+      },
+    ],
   },
   {
     id: 3,
@@ -34,6 +65,17 @@ export const flights = [
     price: 210,
     currency: '$',
     bookingUrl: 'https://www.aa.com',
+    segments: [
+      {
+        flightNumber: 'AA 156',
+        airline: 'American Airlines',
+        departureAirport: 'JFK',
+        departureTime: '10:15',
+        arrivalAirport: 'ORD',
+        arrivalTime: '12:30',
+        duration: 195,
+      },
+    ],
   },
   {
     id: 4,
@@ -46,6 +88,26 @@ export const flights = [
     price: 175,
     currency: '$',
     bookingUrl: 'https://www.delta.com',
+    segments: [
+      {
+        flightNumber: 'DL 104',
+        airline: 'Delta Air Lines',
+        departureAirport: 'JFK',
+        departureTime: '14:00',
+        arrivalAirport: 'ATL',
+        arrivalTime: '16:45',
+        duration: 165,
+      },
+      {
+        flightNumber: 'DL 2847',
+        airline: 'Delta Air Lines',
+        departureAirport: 'ATL',
+        departureTime: '17:30',
+        arrivalAirport: 'ORD',
+        arrivalTime: '19:30',
+        duration: 120,
+      },
+    ],
   },
   {
     id: 5,
@@ -58,6 +120,17 @@ export const flights = [
     price: 129,
     currency: '$',
     bookingUrl: 'https://www.southwest.com',
+    segments: [
+      {
+        flightNumber: 'WN 809',
+        airline: 'Southwest Airlines',
+        departureAirport: 'JFK',
+        departureTime: '07:45',
+        arrivalAirport: 'ORD',
+        arrivalTime: '10:15',
+        duration: 150,
+      },
+    ],
   },
   {
     id: 6,
@@ -70,6 +143,17 @@ export const flights = [
     price: 199,
     currency: '$',
     bookingUrl: 'https://www.jetblue.com',
+    segments: [
+      {
+        flightNumber: 'B6 321',
+        airline: 'JetBlue',
+        departureAirport: 'JFK',
+        departureTime: '11:30',
+        arrivalAirport: 'ORD',
+        arrivalTime: '14:30',
+        duration: 180,
+      },
+    ],
   },
   {
     id: 7,
@@ -82,6 +166,35 @@ export const flights = [
     price: 159,
     currency: '$',
     bookingUrl: 'https://www.aa.com',
+    segments: [
+      {
+        flightNumber: 'AA 288',
+        airline: 'American Airlines',
+        departureAirport: 'JFK',
+        departureTime: '06:00',
+        arrivalAirport: 'PHL',
+        arrivalTime: '06:55',
+        duration: 55,
+      },
+      {
+        flightNumber: 'AA 1245',
+        airline: 'American Airlines',
+        departureAirport: 'PHL',
+        departureTime: '07:45',
+        arrivalAirport: 'CLT',
+        arrivalTime: '09:15',
+        duration: 90,
+      },
+      {
+        flightNumber: 'AA 892',
+        airline: 'American Airlines',
+        departureAirport: 'CLT',
+        departureTime: '10:00',
+        arrivalAirport: 'ORD',
+        arrivalTime: '12:05',
+        duration: 125,
+      },
+    ],
   },
   {
     id: 8,
@@ -94,6 +207,17 @@ export const flights = [
     price: 225,
     currency: '$',
     bookingUrl: 'https://www.united.com',
+    segments: [
+      {
+        flightNumber: 'UA 441',
+        airline: 'United Airlines',
+        departureAirport: 'JFK',
+        departureTime: '16:20',
+        arrivalAirport: 'ORD',
+        arrivalTime: '19:10',
+        duration: 170,
+      },
+    ],
   },
   {
     id: 9,
@@ -106,6 +230,17 @@ export const flights = [
     price: 88,
     currency: '$',
     bookingUrl: 'https://www.delta.com',
+    segments: [
+      {
+        flightNumber: 'DL 2845',
+        airline: 'Delta Air Lines',
+        departureAirport: 'LAX',
+        departureTime: '06:15',
+        arrivalAirport: 'SFO',
+        arrivalTime: '07:40',
+        duration: 85,
+      },
+    ],
   },
   {
     id: 10,
@@ -118,6 +253,17 @@ export const flights = [
     price: 72,
     currency: '$',
     bookingUrl: 'https://www.alaskaair.com',
+    segments: [
+      {
+        flightNumber: 'AS 3408',
+        airline: 'Alaska Airlines',
+        departureAirport: 'LAX',
+        departureTime: '09:30',
+        arrivalAirport: 'SFO',
+        arrivalTime: '10:50',
+        duration: 80,
+      },
+    ],
   },
   {
     id: 11,
@@ -130,6 +276,17 @@ export const flights = [
     price: 64,
     currency: '$',
     bookingUrl: 'https://www.southwest.com',
+    segments: [
+      {
+        flightNumber: 'WN 2210',
+        airline: 'Southwest Airlines',
+        departureAirport: 'LAX',
+        departureTime: '12:10',
+        arrivalAirport: 'SFO',
+        arrivalTime: '13:40',
+        duration: 90,
+      },
+    ],
   },
   {
     id: 12,
@@ -142,6 +299,26 @@ export const flights = [
     price: 118,
     currency: '$',
     bookingUrl: 'https://www.united.com',
+    segments: [
+      {
+        flightNumber: 'UA 1105',
+        airline: 'United Airlines',
+        departureAirport: 'LAX',
+        departureTime: '16:45',
+        arrivalAirport: 'SJC',
+        arrivalTime: '17:55',
+        duration: 70,
+      },
+      {
+        flightNumber: 'UA 2198',
+        airline: 'United Airlines',
+        departureAirport: 'SJC',
+        departureTime: '18:45',
+        arrivalAirport: 'SFO',
+        arrivalTime: '19:15',
+        duration: 30,
+      },
+    ],
   },
   {
     id: 13,
@@ -154,6 +331,17 @@ export const flights = [
     price: 246,
     currency: '$',
     bookingUrl: 'https://www.alaskaair.com',
+    segments: [
+      {
+        flightNumber: 'AS 22',
+        airline: 'Alaska Airlines',
+        departureAirport: 'SEA',
+        departureTime: '08:30',
+        arrivalAirport: 'JFK',
+        arrivalTime: '16:55',
+        duration: 325,
+      },
+    ],
   },
   {
     id: 14,
@@ -166,6 +354,17 @@ export const flights = [
     price: 228,
     currency: '$',
     bookingUrl: 'https://www.delta.com',
+    segments: [
+      {
+        flightNumber: 'DL 464',
+        airline: 'Delta Air Lines',
+        departureAirport: 'SEA',
+        departureTime: '11:15',
+        arrivalAirport: 'JFK',
+        arrivalTime: '19:30',
+        duration: 315,
+      },
+    ],
   },
   {
     id: 15,
@@ -178,6 +377,26 @@ export const flights = [
     price: 186,
     currency: '$',
     bookingUrl: 'https://www.jetblue.com',
+    segments: [
+      {
+        flightNumber: 'B6 918',
+        airline: 'JetBlue',
+        departureAirport: 'SEA',
+        departureTime: '13:40',
+        arrivalAirport: 'BOS',
+        arrivalTime: '22:00',
+        duration: 320,
+      },
+      {
+        flightNumber: 'B6 1524',
+        airline: 'JetBlue',
+        departureAirport: 'BOS',
+        departureTime: '22:30',
+        arrivalAirport: 'JFK',
+        arrivalTime: '23:30',
+        duration: 60,
+      },
+    ],
   },
   {
     id: 16,
@@ -190,6 +409,35 @@ export const flights = [
     price: 164,
     currency: '$',
     bookingUrl: 'https://www.aa.com',
+    segments: [
+      {
+        flightNumber: 'AA 668',
+        airline: 'American Airlines',
+        departureAirport: 'SEA',
+        departureTime: '06:05',
+        arrivalAirport: 'DFW',
+        arrivalTime: '12:00',
+        duration: 295,
+      },
+      {
+        flightNumber: 'AA 1892',
+        airline: 'American Airlines',
+        departureAirport: 'DFW',
+        departureTime: '12:45',
+        arrivalAirport: 'PHL',
+        arrivalTime: '17:15',
+        duration: 270,
+      },
+      {
+        flightNumber: 'AA 456',
+        airline: 'American Airlines',
+        departureAirport: 'PHL',
+        departureTime: '18:00',
+        arrivalAirport: 'JFK',
+        arrivalTime: '19:00',
+        duration: 60,
+      },
+    ],
   },
   {
     id: 17,
@@ -202,6 +450,17 @@ export const flights = [
     price: 189,
     currency: '$',
     bookingUrl: 'https://www.aa.com',
+    segments: [
+      {
+        flightNumber: 'AA 241',
+        airline: 'American Airlines',
+        departureAirport: 'MIA',
+        departureTime: '07:20',
+        arrivalAirport: 'LAX',
+        arrivalTime: '10:40',
+        duration: 400,
+      },
+    ],
   },
   {
     id: 18,
@@ -214,6 +473,17 @@ export const flights = [
     price: 212,
     currency: '$',
     bookingUrl: 'https://www.delta.com',
+    segments: [
+      {
+        flightNumber: 'DL 587',
+        airline: 'Delta Air Lines',
+        departureAirport: 'MIA',
+        departureTime: '10:30',
+        arrivalAirport: 'LAX',
+        arrivalTime: '13:30',
+        duration: 420,
+      },
+    ],
   },
   {
     id: 19,
@@ -226,6 +496,26 @@ export const flights = [
     price: 176,
     currency: '$',
     bookingUrl: 'https://www.united.com',
+    segments: [
+      {
+        flightNumber: 'UA 1520',
+        airline: 'United Airlines',
+        departureAirport: 'MIA',
+        departureTime: '14:10',
+        arrivalAirport: 'IAH',
+        arrivalTime: '16:20',
+        duration: 130,
+      },
+      {
+        flightNumber: 'UA 1845',
+        airline: 'United Airlines',
+        departureAirport: 'IAH',
+        departureTime: '17:15',
+        arrivalAirport: 'LAX',
+        arrivalTime: '19:30',
+        duration: 255,
+      },
+    ],
   },
   {
     id: 20,
@@ -238,5 +528,16 @@ export const flights = [
     price: 198,
     currency: '$',
     bookingUrl: 'https://www.jetblue.com',
+    segments: [
+      {
+        flightNumber: 'B6 625',
+        airline: 'JetBlue',
+        departureAirport: 'MIA',
+        departureTime: '17:45',
+        arrivalAirport: 'LAX',
+        arrivalTime: '21:35',
+        duration: 430,
+      },
+    ],
   },
 ]

@@ -21,16 +21,40 @@ export default function FlightDetailClient({ flight }) {
   const disabled = isFull && !selected
 
   const handleGetDeal = async () => {
+    // If flight has a direct booking URL (static data), use it
     if (flight.bookingUrl) {
       window.open(flight.bookingUrl, '_blank')
       return
     }
-    setLoadingLinks(true)
-    const data = await fetchBookingLinks(flight.id)
-    if (data?.booking_options?.[0]?.links?.[0]?.url) {
-      window.open(data.booking_options[0].links[0].url, '_blank')
+
+    // For live flights (Ignav), fetch booking links
+    const flightId = String(flight.id)
+    if (flightId && !/^\d+$/.test(flightId)) {
+      setLoadingLinks(true)
+      try {
+        const data = await fetchBookingLinks(flight.id)
+        if (data?.booking_options?.[0]?.links?.[0]?.url) {
+          window.open(data.booking_options[0].links[0].url, '_blank')
+        }
+      } catch {
+        // Silently handle errors
+      }
+      setLoadingLinks(false)
+    } else {
+      // For static flights without bookingUrl, try airline website
+      const airlineUrls = {
+        'Delta Air Lines': 'https://www.delta.com',
+        'United Airlines': 'https://www.united.com',
+        'American Airlines': 'https://www.aa.com',
+        'Southwest Airlines': 'https://www.southwest.com',
+        'JetBlue': 'https://www.jetblue.com',
+        'Alaska Airlines': 'https://www.alaskaair.com',
+      }
+      const url = airlineUrls[flight.airline]
+      if (url) {
+        window.open(url, '_blank')
+      }
     }
-    setLoadingLinks(false)
   }
 
   const hasSegments = flight.segments && flight.segments.length > 0

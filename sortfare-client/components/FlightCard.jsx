@@ -17,17 +17,41 @@ export default function FlightCard({ flight, isBest = false, showCompare = true 
     flight.stops === 0 ? 'Nonstop' : flight.stops === 1 ? '1 stop' : `${flight.stops} stops`
 
   const handleGetDeal = async () => {
+    // If flight has a direct booking URL (static data), use it
     if (flight.bookingUrl) {
       window.open(flight.bookingUrl, '_blank')
       return
     }
 
-    setLoadingLinks(true)
-    const data = await fetchBookingLinks(flight.id)
-    if (data?.booking_options?.[0]?.links?.[0]?.url) {
-      window.open(data.booking_options[0].links[0].url, '_blank')
+    // For live flights (Ignav), fetch booking links
+    // Only attempt if ID looks like an Ignav ID (non-numeric or string format)
+    const flightId = String(flight.id)
+    if (flightId && !/^\d+$/.test(flightId)) {
+      setLoadingLinks(true)
+      try {
+        const data = await fetchBookingLinks(flight.id)
+        if (data?.booking_options?.[0]?.links?.[0]?.url) {
+          window.open(data.booking_options[0].links[0].url, '_blank')
+        }
+      } catch {
+        // Silently handle errors
+      }
+      setLoadingLinks(false)
+    } else {
+      // For static flights without bookingUrl, try airline website
+      const airlineUrls = {
+        'Delta Air Lines': 'https://www.delta.com',
+        'United Airlines': 'https://www.united.com',
+        'American Airlines': 'https://www.aa.com',
+        'Southwest Airlines': 'https://www.southwest.com',
+        'JetBlue': 'https://www.jetblue.com',
+        'Alaska Airlines': 'https://www.alaskaair.com',
+      }
+      const url = airlineUrls[flight.airline]
+      if (url) {
+        window.open(url, '_blank')
+      }
     }
-    setLoadingLinks(false)
   }
 
   return (
@@ -114,7 +138,7 @@ export default function FlightCard({ flight, isBest = false, showCompare = true 
           </div>
           <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
             <Link
-              href={`/flights/${flight.id}`}
+              href={`/flights/${flight.id}?origin=${flight.departure.code}&destination=${flight.arrival.code}`}
               className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-line px-4 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-paper hover:text-accent-600"
             >
               Details
