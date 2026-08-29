@@ -3,6 +3,20 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signOut } from '@/lib/auth-client'
+import { Skeleton } from '@heroui/react'
+
+function getInitials(name, email) {
+  if (name && name.trim()) {
+    return name
+      .trim()
+      .split(/\s+/)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  }
+  return (email?.[0] || '?').toUpperCase()
+}
 
 export default function AccountPage() {
   const router = useRouter()
@@ -16,10 +30,20 @@ export default function AccountPage() {
 
   if (isPending) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="text-2xl font-bold">Account</h1>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-gray-500">Loading...</p>
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="sf-card overflow-hidden">
+          <div className="flex items-center gap-4 border-b border-line bg-primary-50/40 px-6 py-6">
+            <Skeleton className="h-14 w-14 shrink-0 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-3 w-20 rounded-md" />
+              <Skeleton className="h-5 w-40 rounded-md" />
+              <Skeleton className="h-3 w-56 rounded-md" />
+            </div>
+          </div>
+          <div className="grid gap-4 px-6 py-6 sm:grid-cols-2">
+            <Skeleton className="h-20 rounded-xl" />
+            <Skeleton className="h-20 rounded-xl" />
+          </div>
         </div>
       </div>
     )
@@ -32,30 +56,56 @@ export default function AccountPage() {
     router.push('/')
   }
 
+  const user = session.user || {}
+  const initials = getInitials(user.name, user.email)
+
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Account</h1>
-
-      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
-        <dl className="mt-4 space-y-3">
-          <div>
-            <dt className="text-sm font-medium text-gray-500">Name</dt>
-            <dd className="mt-1 text-sm text-gray-900">{session.user?.name || '—'}</dd>
+    <div className="mx-auto max-w-3xl px-4 py-10">
+      <div className="sf-card overflow-hidden">
+        {/* Header band */}
+        <div className="flex items-center gap-4 border-b border-line bg-primary-50/40 px-6 py-6">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-600 text-lg font-bold text-white">
+            {initials}
           </div>
-          <div>
-            <dt className="text-sm font-medium text-gray-500">Email</dt>
-            <dd className="mt-1 text-sm text-gray-900">{session.user?.email || '—'}</dd>
+          <div className="min-w-0">
+            <p className="sf-eyebrow">Account</p>
+            <h1 className="truncate text-xl font-bold text-ink">
+              {user.name || 'Traveler'}
+            </h1>
+            <p className="truncate text-sm text-slate-500">{user.email || '—'}</p>
           </div>
-        </dl>
+        </div>
 
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="mt-6 cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
-        >
-          Sign Out
-        </button>
+        {/* Details */}
+        <div className="px-6 py-6">
+          <dl className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-line bg-paper/50 p-4">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Name
+              </dt>
+              <dd className="mt-1 font-mono text-sm text-ink">{user.name || '—'}</dd>
+            </div>
+            <div className="rounded-xl border border-line bg-paper/50 p-4">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Email
+              </dt>
+              <dd className="mt-1 font-mono text-sm text-ink">{user.email || '—'}</dd>
+            </div>
+          </dl>
+
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-400">Signed in to SortFare</p>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="cursor-pointer rounded-lg bg-accent-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-700"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        <div className="sf-barcode" aria-hidden="true" />
       </div>
     </div>
   )
