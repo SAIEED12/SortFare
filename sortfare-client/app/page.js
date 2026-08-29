@@ -1,8 +1,6 @@
 import Link from 'next/link'
-import { Card } from '@heroui/react'
 import FlightCard from '@/components/FlightCard'
-import GlobeHero from '@/components/GlobeHero'
-import ShaderHero from '@/components/ShaderHero'
+import HomeHero from '@/components/HomeHero'
 import { flights } from '@/data/flights'
 
 const steps = [
@@ -61,11 +59,11 @@ const features = [
     ),
   },
   {
-    title: 'Save flights',
-    description: 'Keep the shortlist you like and compare it anytime from your saved flights.',
+    title: 'Ask the assistant',
+    description: 'Describe the trip in plain language and let the assistant search and compare for you.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0C7.418 8.05 6.75 8.907 6.75 9.882v4.286c0 .837.493 1.58 1.229 1.905m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
       </svg>
     ),
   },
@@ -85,39 +83,48 @@ const popularFlights = [...flights].sort((a, b) => a.price - b.price).slice(0, 3
 export default function Home() {
   return (
     <>
-      <ShaderHero />
-      <GlobeHero />
+      <HomeHero />
 
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="how-it-works" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
-        <div className="text-center">
+      <section
+        className="mx-auto max-w-7xl px-4 py-20 sm:py-24"
+        aria-labelledby="how-it-works"
+        style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
+      >
+        <div className="max-w-2xl">
           <p className="sf-eyebrow">How it works</p>
           <h2 id="how-it-works" className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             From search to takeoff in three steps
           </h2>
         </div>
 
-        <ol className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* An ordered list because the steps genuinely happen in this order. */}
+        <ol className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
           {steps.map((step) => (
-            <li
-              key={step.number}
-              className="sf-card p-6 text-center"
-            >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
-                {step.icon}
+            <li key={step.number} className="relative border-t border-line pt-6">
+              <span
+                className="absolute -top-px left-0 h-px w-12 bg-accent-500"
+                aria-hidden="true"
+              />
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-bold tracking-[0.2em] text-accent-600">
+                  {step.number}
+                </span>
+                <span className="text-primary-400">{step.icon}</span>
               </div>
-              <span className="mt-4 block text-xs font-semibold text-accent-600">
-                Step {step.number}
-              </span>
-              <h3 className="mt-1 text-lg font-semibold text-ink">{step.title}</h3>
+              <h3 className="mt-4 text-lg font-semibold text-ink">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-500">{step.description}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="bg-surface py-20" aria-labelledby="features" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
+      <section
+        className="border-y border-line bg-surface py-20 sm:py-24"
+        aria-labelledby="features"
+        style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
+      >
         <div className="mx-auto max-w-7xl px-4">
-          <div className="text-center">
+          <div className="max-w-2xl">
             <p className="sf-eyebrow">Features</p>
             <h2 id="features" className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
               Everything you need to pick the right flight
@@ -126,21 +133,26 @@ export default function Home() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
-              <Card key={feature.title} className="w-full border border-line bg-surface">
-                <Card.Content className="p-6">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
-                    {feature.icon}
-                  </div>
-                  <h3 className="mt-4 text-base font-semibold text-ink">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{feature.description}</p>
-                </Card.Content>
-              </Card>
+              <div
+                key={feature.title}
+                className="rounded-2xl border border-line bg-paper/40 p-6 transition-colors hover:border-accent-200 hover:bg-accent-50/40"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface text-accent-600 shadow-sm">
+                  {feature.icon}
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-ink">{feature.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="popular-deals" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
+      <section
+        className="mx-auto max-w-7xl px-4 py-20 sm:py-24"
+        aria-labelledby="popular-deals"
+        style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
+      >
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="sf-eyebrow">Popular deals</p>
@@ -167,26 +179,37 @@ export default function Home() {
       </section>
 
       <section className="px-4 pb-20" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-accent-500 to-primary-800 px-6 py-16 text-center shadow-sm sm:px-16">
-          <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Your next flight is one search away
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm text-accent-100 sm:text-base">
-            Create a free account to save flights and keep your shortlist handy for when you are ready to book.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/signup"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-accent-700 transition-colors hover:bg-accent-50 sm:w-auto"
-            >
-              Create free account
-            </Link>
-            <Link
-              href="/flights"
-              className="inline-flex w-full items-center justify-center rounded-lg border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:w-auto"
-            >
-              Search flights
-            </Link>
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-primary-900 px-6 py-16 text-center sm:px-16">
+          <div
+            className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-accent-500/25 blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-32 -right-16 h-72 w-72 rounded-full bg-accent-400/15 blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative">
+            <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Your next flight is one search away
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-sm text-primary-100 sm:text-base">
+              Create a free account to keep your details handy, or jump straight into the
+              fares — no account needed to search.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/signup"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary-900 transition-colors hover:bg-accent-50 sm:w-auto"
+              >
+                Create free account
+              </Link>
+              <Link
+                href="/flights"
+                className="inline-flex w-full items-center justify-center rounded-xl border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:w-auto"
+              >
+                Search flights
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -15,7 +15,7 @@ function LoadingFallback() {
   )
 }
 
-export default function GlobeCanvas() {
+export default function GlobeCanvas({ showStars = true }) {
   return (
     <div className="relative h-full w-full">
       <Canvas
@@ -25,7 +25,7 @@ export default function GlobeCanvas() {
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <GlobeScene />
+          <GlobeScene showStars={showStars} />
         </Suspense>
       </Canvas>
     </div>

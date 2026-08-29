@@ -114,7 +114,7 @@ function InteractiveArc({ route, onHover, onUnhover, hovered }) {
   )
 }
 
-export default function GlobeScene() {
+export default function GlobeScene({ showStars = true }) {
   const reducedMotion = usePrefersReducedMotion()
   const [hoveredRoute, setHoveredRoute] = useState(null)
   const controlsRef = useRef()
@@ -128,7 +128,7 @@ export default function GlobeScene() {
       <directionalLight position={[5, 3, 5]} intensity={1.2} />
       <pointLight position={[-5, -3, -5]} intensity={0.4} color="#4488ff" />
 
-      <Stars />
+      {showStars && <Stars />}
 
       <Suspense fallback={null}>
         <EarthSphere />
