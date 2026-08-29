@@ -40,7 +40,7 @@ export default function FlightsError({ error, reset }) {
         <button
           type="button"
           onClick={reset}
-          className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 active:scale-[0.98]"
+          className="cursor-pointer rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 active:scale-[0.98]"
         >
           Try again
         </button>

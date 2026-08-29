@@ -59,7 +59,7 @@ export default function FlightRow({ flight }) {
             <button
               onClick={handleGetDeal}
               disabled={loadingLinks}
-              className="rounded-md bg-accent-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-accent-700 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer rounded-md bg-accent-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-accent-700 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loadingLinks ? 'Loading…' : 'Get deal'}
             </button>

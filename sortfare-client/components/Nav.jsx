@@ -72,7 +72,7 @@ export default function Nav() {
             <button
               type="button"
               onClick={handleSignOut}
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-accent-600"
+              className="cursor-pointer text-sm font-medium text-slate-600 transition-colors hover:text-accent-600"
             >
               Sign Out
             </button>
@@ -123,7 +123,7 @@ export default function Nav() {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-paper"
+                className="block w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-paper"
               >
                 Sign Out
               </button>

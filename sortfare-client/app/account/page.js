@@ -52,7 +52,7 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={handleSignOut}
-          className="mt-6 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="mt-6 cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
         >
           Sign Out
         </button>
