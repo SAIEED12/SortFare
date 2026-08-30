@@ -88,7 +88,7 @@ export default function Home() {
 
       {/* Trust metrics — quiet reassurance, not celebration */}
       <section
-        className="border-y border-line bg-surface"
+        className="overflow-hidden border-y border-line bg-surface"
         aria-label="SortFare by the numbers"
       >
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center divide-x divide-line px-4 py-5 sm:justify-between sm:divide-x-0">

@@ -96,6 +96,7 @@ body {
   color: var(--sf-ink);
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4 {

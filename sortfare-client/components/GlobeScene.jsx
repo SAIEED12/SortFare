@@ -158,14 +158,13 @@ export default function GlobeScene({ showStars = true }) {
 
       <OrbitControls
         ref={controlsRef}
-        enableZoom={true}
+        enableZoom={false}
         enablePan={false}
         minDistance={1.5}
         maxDistance={5}
         autoRotate={!reducedMotion && !hoveredRoute}
         autoRotateSpeed={0.4}
         rotateSpeed={0.5}
-        zoomSpeed={0.8}
       />
     </>
   )

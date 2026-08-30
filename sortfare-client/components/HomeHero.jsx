@@ -35,7 +35,7 @@ export default function HomeHero() {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
-    <section className="relative overflow-hidden bg-gray-950">
+    <section className="relative w-full overflow-hidden bg-gray-950">
       {/* Atmosphere */}
       {reducedMotion ? <ShaderFallback /> : <ShaderCanvas />}
 
@@ -45,7 +45,7 @@ export default function HomeHero() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pt-14 sm:pt-20 lg:pt-24">
+      <div className="relative z-10 mx-auto max-w-7xl overflow-hidden px-4 pt-14 sm:pt-20 lg:pt-24">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           {/* Thesis */}
           <div className="text-center lg:text-left">
@@ -54,7 +54,7 @@ export default function HomeHero() {
               50+ airlines, one view
             </span>
 
-            <h1 className="mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
               Find the best fare for{' '}
               <span className="bg-gradient-to-r from-accent-300 to-accent-100 bg-clip-text text-transparent">
                 every flight
@@ -92,11 +92,11 @@ export default function HomeHero() {
           {/* The object in the atmosphere */}
           <div className="relative">
             <div
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-500/20 blur-3xl sm:h-[28rem] sm:w-[28rem]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[16rem] w-[16rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-500/20 blur-2xl sm:h-[22rem] sm:w-[22rem] sm:blur-3xl lg:h-[28rem] lg:w-[28rem]"
               aria-hidden="true"
             />
             <div
-              className="relative mx-auto h-[280px] w-full max-w-[520px] sm:h-[380px] lg:h-[460px]"
+              className="relative mx-auto h-[300px] w-full max-w-[520px] sm:h-[380px] lg:h-[460px]"
               role="img"
               aria-label="Interactive 3D globe showing eight flight routes between major airports"
             >
@@ -139,7 +139,7 @@ export default function HomeHero() {
                         <div className="border-l-2 border-dashed border-line sm:hidden" aria-hidden="true" />
                       </>
                     )}
-                    <div className="flex-1 bg-paper/50 px-4 py-4">
+                    <div className="flex-1 bg-paper/50 px-3 py-3 sm:px-4 sm:py-4">
                       <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-ink">
                         {route.from}
                         <svg className="h-3 w-3 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
