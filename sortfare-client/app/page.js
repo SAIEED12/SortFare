@@ -140,7 +140,7 @@ export default function Home() {
       </section>
 
       <section
-        className="border-y border-line bg-surface py-20 sm:py-24"
+        className="border-y border-accent-200 bg-accent-50 py-20 sm:py-24"
         aria-labelledby="features"
         style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
       >
@@ -156,9 +156,9 @@ export default function Home() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="rounded-2xl border border-line bg-paper/40 p-6 transition-colors hover:border-accent-200 hover:bg-accent-50/40"
+                className="rounded-2xl border border-accent-200/60 bg-white/70 p-6 transition-colors hover:border-accent-300 hover:bg-white"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface text-accent-600 shadow-sm">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-600 text-white shadow-sm">
                   {feature.icon}
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-ink">{feature.title}</h3>
