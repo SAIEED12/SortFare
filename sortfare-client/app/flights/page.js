@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import FlightsContent from '@/components/FlightsContent'
 import FeaturedRoutes from '@/components/FeaturedRoutes'
 import FlightSkeleton from '@/components/FlightSkeleton'
+import CompareBar from '@/components/CompareBar'
 
 export default async function FlightsPage({ searchParams }) {
   const params = await searchParams
@@ -31,6 +32,8 @@ export default async function FlightsPage({ searchParams }) {
         <Suspense fallback={<FlightSkeleton />}>
           <FeaturedRoutes origin={origin} destination={destination} />
         </Suspense>
+
+        <CompareBar />
       </div>
     )
   }

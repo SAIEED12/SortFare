@@ -12,7 +12,7 @@ async function getFlight(id, searchParams) {
   // Try fetching from API if not static (for Ignav IDs)
   // Pass origin/destination so the API can re-run the Ignav search
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_APP_URL || 'http://localhost:3000'
     const params = new URLSearchParams({ id })
     if (searchParams.origin) params.set('origin', searchParams.origin)
     if (searchParams.destination) params.set('destination', searchParams.destination)
