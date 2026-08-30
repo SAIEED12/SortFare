@@ -2,7 +2,6 @@
 import { useFlights } from '@/hooks/useFlights'
 import FlightFilters from '@/components/FlightFilters'
 import FlightList from '@/components/FlightList'
-import CompareBar from '@/components/CompareBar'
 
 export default function FlightPageClient({ flights }) {
   const { filters, updateFilter, filteredFlights, uniqueAirlines } = useFlights(flights)
@@ -27,8 +26,6 @@ export default function FlightPageClient({ flights }) {
       <div style={{ minHeight: '200px' }}>
         <FlightList flights={filteredFlights} />
       </div>
-
-      <CompareBar />
     </div>
   )
 }

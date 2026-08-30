@@ -6,6 +6,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { CompareProvider } from "@/context/CompareContext";
+import CompareBar from "@/components/CompareBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
           <Nav />
           <main id="main-content" className="flex-1">{children}</main>
           <Footer />
+          <CompareBar />
         </CompareProvider>
       </body>
     </html>
