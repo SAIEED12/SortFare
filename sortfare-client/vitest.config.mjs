@@ -15,5 +15,11 @@ export default defineConfig({
       inline: [/@heroui/],
     },
     exclude: ['tests/e2e/**', 'node_modules/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      include: ['components/**/*.jsx', 'lib/**/*.js', 'hooks/**/*.js'],
+      exclude: ['tests/**', 'node_modules/**'],
+    },
   },
 })

@@ -22,7 +22,7 @@ A flight comparison app where users search, compare, and rank flights across air
 
 | Category | Technology |
 |----------|------------|
-| Framework | Next.js 15 (App Router), React |
+| Framework | Next.js 16 (App Router), React 19 |
 | Styling | Tailwind CSS |
 | UI Components | HeroUI (primary) + Shadcn UI (supplementary) |
 | 3D Graphics | Three.js, React Three Fiber, Drei |
@@ -32,7 +32,7 @@ A flight comparison app where users search, compare, and rank flights across air
 
 ## Architecture
 
-This repository is **frontend-only**. Business logic and flight data APIs live in a separate SortFare server repository. This app consumes that API via `NEXT_PUBLIC_API_URL`.
+This repository includes Next.js API routes for AI chat, auth, and flight search. Flight data comes from a local demo catalog or the external Ignav API.
 
 ```
 SortFare-Client (this repo)          Separate server repo
@@ -213,10 +213,44 @@ The Gemini free tier allows **20 model requests per day**. Each tool step counts
 ## Running Tests
 
 ```bash
-npm run test        # Run Vitest unit tests
-npm run test:watch  # Run tests in watch mode
-npm run lint        # Run ESLint
+npm run test            # Run Vitest unit tests
+npm run test:coverage   # Run tests with coverage report
+npm run test:watch      # Run tests in watch mode
+npm run test:e2e        # Run Playwright end-to-end tests
+npm run lint            # Run ESLint
 ```
+
+## Deployment Checklist
+
+- [ ] Environment variables set in Vercel: `GEMINI_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_API_URL`
+- [ ] MongoDB connection string configured (for auth + saved flights)
+- [ ] `npm run build` passes locally
+- [ ] Lighthouse accessibility score ≥90 on all pages
+- [ ] Error boundaries in place (`app/error.js`, `app/flights/error.js`)
+- [ ] Rollback: redeploy previous commit from Vercel dashboard or `git revert && git push`
+- [ ] Health check: `/health` page returns 200
+
+## How It Fails Safely
+
+| Failure | Behavior |
+|---------|----------|
+| Ignav API down | Falls back to 20-flight demo catalog; banner shown |
+| Gemini quota exceeded | Amber "limit reached" card in chat |
+| Network error | Orange retry banner in chat |
+| Unknown error | Red generic error card with dismiss |
+| Invalid route | 404 page with navigation links |
+| Unauthenticated access to `/account` | Redirect to `/login` via middleware |
+
+## Reflection
+
+### What was hardest?
+The AI tool loop was the hardest part — getting streaming, tool execution, error sanitization, and quota management to work together required understanding the Vercel AI SDK's internals deeply. The Three.js integration with Next.js dynamic imports was also challenging due to SSR compatibility issues.
+
+### What would I do differently?
+Start with TypeScript from day one — the Zod schemas proved type safety matters, and retrofitting types is harder than starting with them. I'd also add CI/CD and error tracking (Sentry) in week 1 instead of treating them as polish tasks.
+
+### One thing that surprised me
+How much accessibility work is retroactive. The contrast fixes alone touched 15 files and 19+ elements. Building accessible components from the start would have been faster than fixing them after an audit.
 
 ## License
 
