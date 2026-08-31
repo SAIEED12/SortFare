@@ -4,9 +4,11 @@ A flight comparison app where users search, compare, and rank flights across air
 
 **Live Demo:** https://sortfare-client.vercel.app
 
-<img width="1900" height="926" alt="image" src="https://github.com/user-attachments/assets/56fac7b1-86b0-4153-a040-43f18382a8e7" />
-<img width="1898" height="926" alt="image" src="https://github.com/user-attachments/assets/c7be0253-2e91-48a9-83ba-4f9aac7d401e" />
-<img width="1902" height="928" alt="image" src="https://github.com/user-attachments/assets/2cd890fd-8d60-417e-a726-74c989731510" />
+<img width="1900" height="929" alt="image" src="https://github.com/user-attachments/assets/e41f98bf-0f9a-4734-a1ce-f0b5fab418e5" />
+<img width="1903" height="920" alt="image" src="https://github.com/user-attachments/assets/023b77f1-0013-4135-bbff-9a7baf3906ba" />
+<img width="1902" height="688" alt="image" src="https://github.com/user-attachments/assets/26588f27-5a64-4af9-af1f-727ab7eed8fb" />
+<img width="1904" height="733" alt="image" src="https://github.com/user-attachments/assets/c47fbc82-c408-4315-8587-202ab007a41e" />
+<img width="1918" height="924" alt="image" src="https://github.com/user-attachments/assets/6a8c738b-f706-45e6-92d8-a3f809769756" />
 <img width="1901" height="921" alt="image" src="https://github.com/user-attachments/assets/a5dce785-d8fd-4bb0-9589-16ca78c36d46" />
 
 ## What It Does
